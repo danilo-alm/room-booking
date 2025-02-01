@@ -14,5 +14,5 @@ CREATE TABLE Users
     FailedLoginAttempts INT          NOT NULL DEFAULT 0
 );
 
-CREATE INDEX IX_Users_Email ON Users (Email);
-CREATE INDEX IX_Users_Username ON Users (Username);
+CREATE UNIQUE INDEX UX_Users_Email ON Users (Email);
+CREATE UNIQUE INDEX UX_Users_Username ON Users (Username);

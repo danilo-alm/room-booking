@@ -14,8 +14,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "Users", indexes = {
-    @Index(name = "IX_Users_Email", columnList = "Email"),
-    @Index(name = "IX_Users_Username", columnList = "Username"),
+    @Index(name = "UX_Users_Email", columnList = "Email"),
+    @Index(name = "UX_Users_Username", columnList = "Username"),
 })
 @DynamicInsert
 @Getter
