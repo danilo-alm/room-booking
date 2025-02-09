@@ -14,7 +14,7 @@ public class UserRepositoryTest extends AbstractRepositoryTest {
     private UserRepository userRepository;
 
     @Test
-    public void shouldSaveAndRetrieveUser() {
+    public void UserRepository_FindUserByUsername_ReturnsUser() {
         User user = createAndSaveUser("user", "user@example.com");
         Optional<User> foundUser = userRepository.findByUsername("user");
 
@@ -23,7 +23,7 @@ public class UserRepositoryTest extends AbstractRepositoryTest {
     }
 
     @Test
-    public void shouldFindUserByEmail() {
+    public void UserRepository_FindUserByEmail_ReturnsUser() {
         User user = createAndSaveUser("user", "user@example.com");
         Optional<User> foundUser = userRepository.findByEmail(user.getEmail());
 
@@ -32,23 +32,21 @@ public class UserRepositoryTest extends AbstractRepositoryTest {
     }
 
     @Test
-    public void shouldFindUserByUsername() {
-        User user = createAndSaveUser("user", "user@example.com");
-        Optional<User> foundUser = userRepository.findByUsername(user.getUsername());
-
-        assertTrue(foundUser.isPresent());
-        assertEquals(user.getUsername(), foundUser.get().getUsername());
-    }
-
-    @Test
-    public void shouldNotFindNonExistentUser() {
+    public void UserRepository_FindByUsername_ReturnsEmptyOptional() {
         Optional<User> user = userRepository.findByUsername("unknown");
 
         assertFalse(user.isPresent());
     }
 
     @Test
-    public void shouldUpdateFailedLoginAttempts() {
+    public void UserRepository_FindByEmail_ReturnsEmptyOptional() {
+        Optional<User> user = userRepository.findByEmail("unknown@example.com");
+
+        assertFalse(user.isPresent());
+    }
+
+    @Test
+    public void UserRepository_Save_UpdatesUser() {
         User user = createAndSaveUser("user", "user@example.com");
         user.setFailedLoginAttempts(3);
         userRepository.save(user);
@@ -60,7 +58,7 @@ public class UserRepositoryTest extends AbstractRepositoryTest {
     }
 
     @Test
-    public void shouldDeleteUser() {
+    public void UserRepository_DeleteById_DeletesUser() {
         User user = createAndSaveUser("user", "user@example.com");
         userRepository.deleteById(user.getId());
 
