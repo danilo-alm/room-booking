@@ -1,44 +1,20 @@
 package com.danilo.roombooking.repository;
 
 import com.danilo.roombooking.domain.User;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MariaDBContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class UserRepositoryTest {
 
-    @Container
-    static MariaDBContainer<?> mariaDBContainer = new MariaDBContainer<>("mariadb:latest")
-        .withDatabaseName("testdb")
-        .withUsername("testuser")
-        .withPassword("testpassword");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mariaDBContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", mariaDBContainer::getUsername);
-        registry.add("spring.datasource.password", mariaDBContainer::getPassword);
-    }
-
+public class UserRepositoryTest extends AbstractRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
     @Test
     public void shouldSaveAndRetrieveUser() {
-        System.out.println("Container URL: " + mariaDBContainer.getJdbcUrl());  // Debugging
         createAndSaveUser("user", "user@example.com");
         Optional<User> foundUser = userRepository.findByUsername("user");
 
