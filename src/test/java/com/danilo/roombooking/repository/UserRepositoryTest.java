@@ -15,20 +15,29 @@ public class UserRepositoryTest extends AbstractRepositoryTest {
 
     @Test
     public void shouldSaveAndRetrieveUser() {
-        createAndSaveUser("user", "user@example.com");
+        User user = createAndSaveUser("user", "user@example.com");
         Optional<User> foundUser = userRepository.findByUsername("user");
 
         assertTrue(foundUser.isPresent());
-        assertEquals("user@example.com", foundUser.get().getEmail());
+        assertEquals(user.getEmail(), foundUser.get().getEmail());
     }
 
     @Test
     public void shouldFindUserByEmail() {
         User user = createAndSaveUser("user", "user@example.com");
-        Optional<User> foundUser = userRepository.findByEmail("user@example.com");
+        Optional<User> foundUser = userRepository.findByEmail(user.getEmail());
 
         assertTrue(foundUser.isPresent());
-        assertEquals("user", foundUser.get().getUsername());
+        assertEquals(user.getUsername(), foundUser.get().getUsername());
+    }
+
+    @Test
+    public void shouldFindUserByUsername() {
+        User user = createAndSaveUser("user", "user@example.com");
+        Optional<User> foundUser = userRepository.findByUsername(user.getUsername());
+
+        assertTrue(foundUser.isPresent());
+        assertEquals(user.getUsername(), foundUser.get().getUsername());
     }
 
     @Test
@@ -44,7 +53,7 @@ public class UserRepositoryTest extends AbstractRepositoryTest {
         user.setFailedLoginAttempts(3);
         userRepository.save(user);
 
-        Optional<User> updatedUser = userRepository.findByUsername("user");
+        Optional<User> updatedUser = userRepository.findByUsername(user.getUsername());
 
         assertTrue(updatedUser.isPresent());
         assertEquals(3, updatedUser.get().getFailedLoginAttempts());
