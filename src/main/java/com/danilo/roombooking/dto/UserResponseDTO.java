@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public record UserResponseDTO(BigInteger id, String username, String fullName, String email,
                               Timestamp createdAt, Timestamp updatedAt, Timestamp lastLogin,
-                              int failedLoginAttempts, boolean enabled, Set<String> authorities) {
+                              Integer failedLoginAttempts, Boolean enabled, Set<String> authorities) {
     public UserResponseDTO(User user) {
         this(
             user.getId(),
@@ -21,7 +21,7 @@ public record UserResponseDTO(BigInteger id, String username, String fullName, S
             user.getUpdatedAt(),
             user.getLastLogin(),
             user.getFailedLoginAttempts(),
-            user.isEnabled(),
+            user.getEnabled(),
             user.getAuthorities().stream().map(Authority::getAuthority).collect(Collectors.toSet())
         );
     }

@@ -6,20 +6,17 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 
 @Entity
-@Table(name = "Authorities", uniqueConstraints = {
-    @UniqueConstraint(name = "UX_Authorities_UserId_Authority", columnNames = {"UserId", "Authority"})
-})
+@Table(name = "Authorities")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder
 @EqualsAndHashCode
 @IdClass(AuthorityId.class)
 public class Authority implements GrantedAuthority {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UserId", columnDefinition = "BIGINT UNSIGNED NOT NULL", foreignKey = @ForeignKey(name = "FK_Authorities_Users"))
+    @JoinColumn(name = "UserId", columnDefinition = "BIGINT UNSIGNED", foreignKey = @ForeignKey(name = "FK_Authorities_Users"))
     private User user;
 
     @Id

@@ -1,6 +1,6 @@
 CREATE TABLE Users
 (
-    Id                  BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    Id                  BIGINT UNSIGNED PRIMARY KEY,
     Username            VARCHAR(36)  NOT NULL UNIQUE,
     Password            CHAR(60)     NOT NULL,
     Enabled             BOOLEAN      NOT NULL DEFAULT TRUE,
@@ -16,3 +16,4 @@ CREATE TABLE Users
 
 CREATE UNIQUE INDEX UX_Users_Email ON Users (Email);
 CREATE UNIQUE INDEX UX_Users_Username ON Users (Username);
+CREATE SEQUENCE user_sequence AS BIGINT INCREMENT BY 1 START WITH 1;

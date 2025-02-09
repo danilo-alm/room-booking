@@ -9,7 +9,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -17,16 +16,17 @@ import java.util.Set;
     @Index(name = "UX_Users_Email", columnList = "Email"),
     @Index(name = "UX_Users_Username", columnList = "Username"),
 })
+@SequenceGenerator(name = "user_seq", sequenceName = "user_sequence", allocationSize = 1)
 @DynamicInsert
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(exclude = "authorities")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Id", columnDefinition = "BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+    @Column(name = "Id", columnDefinition = "BIGINT UNSIGNED")
     private BigInteger id;
 
     @Column(name = "Username", columnDefinition = "VARCHAR(36) NOT NULL UNIQUE")
@@ -36,7 +36,7 @@ public class User {
     private String password;
 
     @Column(name = "Enabled", columnDefinition = "BOOLEAN NOT NULL DEFAULT TRUE")
-    private boolean enabled;
+    private Boolean enabled;
 
     @Column(name = "Email", columnDefinition = "VARCHAR(254) NOT NULL UNIQUE")
     private String email;
@@ -56,24 +56,8 @@ public class User {
     private Timestamp lastLogin;
 
     @Column(name = "FailedLoginAttempts", columnDefinition = "INT NOT NULL DEFAULT 0")
-    private int failedLoginAttempts;
+    private Integer failedLoginAttempts;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Authority> authorities;
-
-    private void ensureAuthorities() {
-        if (this.authorities == null) {
-            this.authorities = new HashSet<>();
-        }
-    }
-
-    public void addAuthority(Authority authority) {
-        ensureAuthorities();
-        this.authorities.add(authority);
-    }
-
-    public void removeAuthority(Authority authority) {
-        ensureAuthorities();
-        this.authorities.remove(authority);
-    }
 }
