@@ -5,20 +5,18 @@ import com.danilo.roombooking.domain.room.RoomStatus;
 import com.danilo.roombooking.domain.room.RoomType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringJUnitConfig
 public class RoomRepositoryTest extends AbstractRepositoryTest {
 
     @Autowired
     private RoomRepository roomRepository;
 
     @Test
-    public void RoomRepository_SaveAndRetrieveRoom_ReturnsRoom() {
+    public void RoomRepository_FindById_ReturnsRoom() {
         Room room = createAndSaveRoom("A101", "Lecture Hall A101", RoomType.LECTURE_HALL, RoomStatus.AVAILABLE, 100);
         Optional<Room> foundRoom = roomRepository.findById(room.getId());
 
