@@ -14,9 +14,18 @@ public class UserRepositoryTest extends AbstractRepositoryTest {
     private UserRepository userRepository;
 
     @Test
+    public void UserRepository_FindById_ReturnsUser() {
+        User user = createAndSaveUser("user", "user@example.com");
+        Optional<User> foundUser = userRepository.findById(user.getId());
+
+        assertTrue(foundUser.isPresent());
+        assertEquals(user.getId(), foundUser.get().getId());
+    }
+
+    @Test
     public void UserRepository_FindUserByUsername_ReturnsUser() {
         User user = createAndSaveUser("user", "user@example.com");
-        Optional<User> foundUser = userRepository.findByUsername("user");
+        Optional<User> foundUser = userRepository.findByUsername(user.getUsername());
 
         assertTrue(foundUser.isPresent());
         assertEquals(user.getEmail(), foundUser.get().getEmail());
