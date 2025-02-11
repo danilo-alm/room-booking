@@ -39,7 +39,7 @@ public class UserServiceTest {
     private User user;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         userDTO = new UserRequestDTO("testUser", "password", "Test User", true, "test@example.com", Set.of("ROLE_USER"));
         user = User.builder()
             .id(BigInteger.ONE)
@@ -53,7 +53,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void UserService_CreateUser_CreatesUser() {
+    public void UserService_CreateUser_CreatesUser() {
         when(passwordEncoder.encode(userDTO.password())).thenReturn("encodedPassword");
         when(userRepository.saveAndFlush(any(User.class))).thenReturn(user);
 
@@ -66,7 +66,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void UserService_GetUser_UsernameParam_ReturnsUser() {
+    public void UserService_GetUser_UsernameParam_ReturnsUser() {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         Optional<UserResponseDTO> response = userService.getUser(user.getId(), null, null);
 
@@ -75,7 +75,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void UserService_GetUser_IdParam_ReturnsUser() {
+    public void UserService_GetUser_IdParam_ReturnsUser() {
         when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
         Optional<UserResponseDTO> response = userService.getUser(null, user.getUsername(), null);
 
@@ -84,7 +84,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void UserService_GetUser_EmailParam_ReturnsUser() {
+    public void UserService_GetUser_EmailParam_ReturnsUser() {
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         Optional<UserResponseDTO> response = userService.getUser(null, null, user.getEmail());
 
@@ -93,13 +93,13 @@ public class UserServiceTest {
     }
 
     @Test
-    void UserService_GetUser_MultipleParams_ReturnsEmpty() {
+    public void UserService_GetUser_MultipleParams_ReturnsEmpty() {
         Optional<UserResponseDTO> response = userService.getUser(BigInteger.ONE, "testUser", "test@example.com");
         assertFalse(response.isPresent());
     }
 
     @Test
-    void UserService_DeleteById_DeletesUser() {
+    public void UserService_DeleteById_DeletesUser() {
         when(userRepository.existsById(user.getId())).thenReturn(true);
         doNothing().when(userRepository).deleteById(user.getId());
 
