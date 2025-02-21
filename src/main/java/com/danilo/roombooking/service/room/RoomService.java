@@ -90,7 +90,7 @@ public class RoomService {
     }
 
     private Set<RoomAmenity> getRoomAmenitySet(Room room, Collection<BigInteger> amenitiesIds) {
-        return amenityService.getAmenities(amenitiesIds).stream().map(amenity ->
+        return amenityService.getAmenitiesByIds(amenitiesIds).stream().map(amenity ->
             new RoomAmenity(room, amenity)).collect(Collectors.toSet());
     }
 

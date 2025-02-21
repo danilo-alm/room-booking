@@ -32,7 +32,7 @@ public class AmenityService {
             .map(AmenityResponseDTO::new).collect(Collectors.toList());
     }
 
-    public List<Amenity> getAmenities(Collection<BigInteger> ids) {
+    public List<Amenity> getAmenitiesByIds(Collection<BigInteger> ids) {
         return amenityRepository.findByIdIn(ids);
     }
 
