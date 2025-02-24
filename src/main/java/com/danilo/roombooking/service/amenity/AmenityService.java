@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,10 +29,6 @@ public class AmenityService {
         }
         return amenityRepository.findByNameStartingWithIgnoreCase(prefix).stream()
             .map(AmenityResponseDTO::new).collect(Collectors.toList());
-    }
-
-    public List<Amenity> getAmenitiesByIds(Collection<BigInteger> ids) {
-        return amenityRepository.findByIdIn(ids);
     }
 
     public void deleteAmenity(BigInteger id) {

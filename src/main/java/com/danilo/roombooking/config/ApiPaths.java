@@ -17,6 +17,7 @@ public final class ApiPaths {
         public static final String CREATE = "";
         public static final String GET = "";
         public static final String GET_TYPES = "/type";
+        public static final String GET_FILTER = "/filter";
         public static final String UPDATE = "/{id}";
         public static final String DELETE = "/{id}";
     }

@@ -2,11 +2,14 @@ package com.danilo.roombooking.service.room;
 
 import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room_amenity.RoomAmenity;
+import com.danilo.roombooking.dto.RoomFilterDTO;
 import com.danilo.roombooking.dto.RoomRequestDTO;
 import com.danilo.roombooking.dto.RoomResponseDTO;
+import com.danilo.roombooking.repository.AmenityRepository;
 import com.danilo.roombooking.repository.RoomRepository;
-import com.danilo.roombooking.service.amenity.AmenityService;
+import com.danilo.roombooking.specification.RoomSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +22,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class RoomService {
     private final RoomRepository roomRepository;
-    private final AmenityService amenityService;
+    private final AmenityRepository amenityRepository;
 
     @Transactional
     public RoomResponseDTO createRoom(RoomRequestDTO roomRequestDTO) {
@@ -50,6 +53,20 @@ public class RoomService {
             return Optional.of(this.getRoomById(id));
         }
         return Optional.of(this.getRoomByIdentifier(identifier));
+    }
+
+    public List<RoomResponseDTO> getFilterRooms(RoomFilterDTO filterDTO) {
+        Specification<Room> spec = Specification
+            .where(RoomSpecification.hasCapacityGreaterThanOrEqualTo(filterDTO.minCapacity()))
+            .and(RoomSpecification.hasCapacityLessThanOrEqualTo(filterDTO.maxCapacity()))
+            .and(RoomSpecification.nameContains(filterDTO.name()))
+            .and(RoomSpecification.hasStatus(filterDTO.status()))
+            .and(RoomSpecification.hasType(filterDTO.type()))
+            .and(RoomSpecification.hasAmenities(filterDTO.amenityIds()));
+
+        return roomRepository.findAll(spec).stream()
+            .map(RoomResponseDTO::new)
+            .toList();
     }
 
     @Transactional
@@ -90,7 +107,7 @@ public class RoomService {
     }
 
     private Set<RoomAmenity> getRoomAmenitySet(Room room, Collection<BigInteger> amenitiesIds) {
-        return amenityService.getAmenitiesByIds(amenitiesIds).stream().map(amenity ->
+        return amenityRepository.findByIdIn(amenitiesIds).stream().map(amenity ->
             new RoomAmenity(room, amenity)).collect(Collectors.toSet());
     }
 

@@ -1,7 +1,9 @@
 package com.danilo.roombooking.controller;
 
 import com.danilo.roombooking.config.ApiPaths;
+import com.danilo.roombooking.domain.room.RoomStatus;
 import com.danilo.roombooking.domain.room.RoomType;
+import com.danilo.roombooking.dto.RoomFilterDTO;
 import com.danilo.roombooking.dto.RoomRequestDTO;
 import com.danilo.roombooking.dto.RoomResponseDTO;
 import com.danilo.roombooking.service.room.RoomService;
@@ -10,8 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping(ApiPaths.Room.ROOT)
@@ -31,6 +35,19 @@ public class RoomController {
     ) {
         Optional<RoomResponseDTO> roomResponseDTO = roomService.getRoom(id, identifier);
         return roomResponseDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.badRequest().build());
+    }
+
+    @GetMapping(ApiPaths.Room.GET_FILTER)
+    public ResponseEntity<List<RoomResponseDTO>> filterRooms(
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) Integer minCapacity,
+        @RequestParam(required = false) Integer maxCapacity,
+        @RequestParam(required = false) RoomStatus status,
+        @RequestParam(required = false) RoomType type,
+        @RequestParam(required = false) Set<BigInteger> amenityIds
+    ) {
+        RoomFilterDTO roomFilterDTO = new RoomFilterDTO(name, minCapacity, maxCapacity, status, type, amenityIds);
+        return ResponseEntity.ok(roomService.getFilterRooms(roomFilterDTO));
     }
 
     @PutMapping(ApiPaths.Room.UPDATE)
