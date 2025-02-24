@@ -93,27 +93,6 @@ public class AmenityServiceTest {
     }
 
     @Test
-    public void AmenityService_GetAmenitiesByIds_ReturnsAmenitiesWithIds() {
-        Amenity amenity = new Amenity();
-        amenity.setName("Whiteboard");
-        amenity.setId(BigInteger.ONE);
-
-        Amenity amenity2 = new Amenity();
-        amenity2.setName("Projector");
-        amenity2.setId(BigInteger.TWO);
-
-        when(amenityRepository.findByIdIn(any())).thenReturn(List.of(amenity, amenity2));
-
-        List<Amenity> response = amenityService.getAmenitiesByIds(List.of(BigInteger.ONE, BigInteger.TWO));
-
-        assertNotNull(response);
-        assertEquals(2, response.size());
-
-        verify(amenityRepository, never()).findAll();
-        verify(amenityRepository).findByIdIn(any());
-    }
-
-    @Test
     public void AmenityService_DeleteAmenity_DeletesAmenity() {
         BigInteger amenityId = BigInteger.ONE;
         when(amenityRepository.existsById(amenityId)).thenReturn(true);
