@@ -1,7 +1,6 @@
 package com.danilo.roombooking.controller;
 
 import com.danilo.roombooking.config.ApiPaths;
-import com.danilo.roombooking.domain.Amenity;
 import com.danilo.roombooking.dto.AmenityRequestDTO;
 import com.danilo.roombooking.dto.AmenityResponseDTO;
 import com.danilo.roombooking.service.amenity.AmenityService;
