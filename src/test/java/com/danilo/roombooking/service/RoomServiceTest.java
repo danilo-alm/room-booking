@@ -11,6 +11,7 @@ import com.danilo.roombooking.repository.AmenityRepository;
 import com.danilo.roombooking.repository.RoomRepository;
 import com.danilo.roombooking.service.room.RoomNotFoundException;
 import com.danilo.roombooking.service.room.RoomService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -42,12 +43,29 @@ public class RoomServiceTest {
     @InjectMocks
     private RoomService roomService;
 
+    BigInteger roomId;
+    Room room1, room2;
+    List<Room> rooms;
+    RoomRequestDTO requestDTO;
+
+    @BeforeEach
+    void setUp() {
+        roomId = BigInteger.ONE;
+
+        room1 = createRoom(BigInteger.ONE, "R101", "Classroom 101", 30);
+        room1.setType(RoomType.SCIENCE_LAB);
+
+        room2 = createRoom(BigInteger.TWO, "R102", "Classroom 102", 25);
+        room2.setType(RoomType.STANDARD_CLASSROOM);
+
+        rooms = List.of(room1, room2);
+
+        requestDTO = createRoomRequestDTO("R101", "Classroom 101", 50);
+    }
+
     @Test
     public void RoomService_CreateRoom_ReturnsCreatedRoom() {
-        RoomRequestDTO requestDTO = createRoomRequestDTO("R101", "Classroom 101", 50);
-        Room room = createRoom(BigInteger.ONE, "R101", "Classroom 101", 50);
-
-        when(roomRepository.saveAndFlush(any(Room.class))).thenReturn(room);
+        when(roomRepository.saveAndFlush(any(Room.class))).thenReturn(room1);
 
         RoomResponseDTO response = roomService.createRoom(requestDTO);
 
@@ -61,10 +79,7 @@ public class RoomServiceTest {
 
     @Test
     public void RoomService_GetRoom_ById_ReturnsRoom() {
-        BigInteger roomId = BigInteger.ONE;
-        Room room = createRoom(roomId, "R101", "Classroom 101", 50);
-
-        when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
+        when(roomRepository.findById(roomId)).thenReturn(Optional.of(room1));
 
         Optional<RoomResponseDTO> response = roomService.getRoom(roomId, null);
 
@@ -77,10 +92,8 @@ public class RoomServiceTest {
 
     @Test
     public void RoomService_GetRoom_ByIdentifier_ReturnsRoom() {
-        String identifier = "R101";
-        Room room = createRoom(BigInteger.ONE, identifier, "Classroom 101", 50);
-
-        when(roomRepository.findByIdentifier(identifier)).thenReturn(Optional.of(room));
+        String identifier = room1.getIdentifier();
+        when(roomRepository.findByIdentifier(identifier)).thenReturn(Optional.of(room1));
 
         Optional<RoomResponseDTO> response = roomService.getRoom(null, identifier);
 
@@ -93,11 +106,6 @@ public class RoomServiceTest {
 
     @Test
     public void RoomService_getFilterRooms_NoFilters_ReturnsAllRooms() {
-        List<Room> rooms = List.of(
-            createRoom(BigInteger.ONE, "R101", "Physics Lab", 30),
-            createRoom(BigInteger.TWO, "R102", "Chemistry Lab", 25)
-        );
-
         when(roomRepository.findAll(ArgumentMatchers.<Specification<Room>>any())).thenReturn(rooms);
 
         RoomFilterDTO filterDTO = new RoomFilterDTO(null, null, null, null, null, null);
@@ -109,11 +117,6 @@ public class RoomServiceTest {
 
     @Test
     public void RoomService_getFilterRooms_FilterByMinCapacity_ReturnsMatchingRooms() {
-        List<Room> rooms = List.of(
-            createRoom(BigInteger.ONE, "R101", "Physics Lab", 30),
-            createRoom(BigInteger.TWO, "R102", "Chemistry Lab", 40)
-        );
-
         when(roomRepository.findAll(ArgumentMatchers.<Specification<Room>>any())).thenReturn(List.of(rooms.get(1)));
 
         RoomFilterDTO filterDTO = new RoomFilterDTO(null, 35, null, null, null, null);
@@ -126,11 +129,6 @@ public class RoomServiceTest {
 
     @Test
     public void RoomService_getFilterRooms_FilterByMaxCapacity_ReturnsMatchingRooms() {
-        List<Room> rooms = List.of(
-            createRoom(BigInteger.ONE, "R101", "Physics Lab", 30),
-            createRoom(BigInteger.TWO, "R102", "Chemistry Lab", 40)
-        );
-
         when(roomRepository.findAll(ArgumentMatchers.<Specification<Room>>any())).thenReturn(List.of(rooms.get(0)));
 
         RoomFilterDTO filterDTO = new RoomFilterDTO(null, null, 35, null, null, null);
@@ -143,31 +141,21 @@ public class RoomServiceTest {
 
     @Test
     public void RoomService_getFilterRooms_FilterByName_ReturnsMatchingRooms() {
-        List<Room> rooms = List.of(
-            createRoom(BigInteger.ONE, "R101", "Physics Lab", 30),
-            createRoom(BigInteger.TWO, "R102", "Chemistry Lab", 25)
-        );
-
-        when(roomRepository.findAll(ArgumentMatchers.<Specification<Room>>any())).thenReturn(List.of(rooms.get(1)));
+        when(roomRepository.findAll(ArgumentMatchers.<Specification<Room>>any())).thenReturn(List.of(room1));
 
         RoomFilterDTO filterDTO = new RoomFilterDTO("Chemistry", null, null, null, null, null);
         List<RoomResponseDTO> result = roomService.getFilterRooms(filterDTO);
 
         assertEquals(1, result.size());
-        assertEquals("Chemistry Lab", result.get(0).name());
+        assertEquals("Classroom 101", result.get(0).name());
         verify(roomRepository).findAll(ArgumentMatchers.<Specification<Room>>any());
     }
 
     @Test
     public void RoomService_getFilterRooms_FilterByStatus_ReturnsMatchingRooms() {
-        Room room1 = createRoom(BigInteger.ONE, "R101", "Physics Lab", 30);
-        room1.setStatus(RoomStatus.OCCUPIED);
+        room1.setStatus(RoomStatus.AVAILABLE);
 
-        Room room2 = createRoom(BigInteger.TWO, "R102", "Chemistry Lab", 25);
-        room2.setStatus(RoomStatus.AVAILABLE);
-
-        List<Room> rooms = List.of(room1, room2);
-        when(roomRepository.findAll(ArgumentMatchers.<Specification<Room>>any())).thenReturn(List.of(room2));
+        when(roomRepository.findAll(ArgumentMatchers.<Specification<Room>>any())).thenReturn(List.of(room1));
 
         RoomFilterDTO filterDTO = new RoomFilterDTO(null, null, null, RoomStatus.AVAILABLE, null, null);
         List<RoomResponseDTO> result = roomService.getFilterRooms(filterDTO);
@@ -179,13 +167,8 @@ public class RoomServiceTest {
 
     @Test
     public void RoomService_getFilterRooms_FilterByType_ReturnsMatchingRooms() {
-        Room room1 = createRoom(BigInteger.ONE, "R101", "Physics Lab", 30);
         room1.setType(RoomType.SCIENCE_LAB);
 
-        Room room2 = createRoom(BigInteger.TWO, "R102", "Chemistry Lab", 25);
-        room2.setType(RoomType.STANDARD_CLASSROOM);
-
-        List<Room> rooms = List.of(room1, room2);
         when(roomRepository.findAll(ArgumentMatchers.<Specification<Room>>any())).thenReturn(List.of(room1));
 
         RoomFilterDTO filterDTO = new RoomFilterDTO(null, null, null, null, RoomType.SCIENCE_LAB, null);
@@ -209,12 +192,10 @@ public class RoomServiceTest {
 
     @Test
     public void RoomService_UpdateRoom_ReturnsUpdatedRoom() {
-        BigInteger roomId = BigInteger.ONE;
-        RoomRequestDTO requestDTO = createRoomRequestDTO("R101", "Updated Classroom", 60);
+        requestDTO = createRoomRequestDTO("R101", "Updated Classroom", 60);
         Amenity amenity = createAmenity(BigInteger.ONE);
-        Room room = createRoom(roomId, "R101", "Classroom 101", 50);
 
-        when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
+        when(roomRepository.findById(roomId)).thenReturn(Optional.of(room1));
         when(amenityRepository.findByIdIn(anyCollection())).thenReturn(List.of(amenity));
 
         RoomResponseDTO response = roomService.updateRoom(roomId, requestDTO);
@@ -229,9 +210,6 @@ public class RoomServiceTest {
 
     @Test
     public void RoomService_UpdateRoom_ThrowsException_WhenRoomNotFound() {
-        BigInteger roomId = BigInteger.ONE;
-        RoomRequestDTO requestDTO = createRoomRequestDTO("R101", "Updated Classroom", 60);
-
         when(roomRepository.findById(roomId)).thenReturn(Optional.empty());
 
         assertThrows(RoomNotFoundException.class, () -> roomService.updateRoom(roomId, requestDTO));
@@ -241,8 +219,6 @@ public class RoomServiceTest {
 
     @Test
     public void RoomService_DeleteRoom_DeletesRoom() {
-        BigInteger roomId = BigInteger.ONE;
-
         when(roomRepository.existsById(roomId)).thenReturn(true);
 
         roomService.deleteRoom(roomId);
@@ -252,8 +228,6 @@ public class RoomServiceTest {
 
     @Test
     public void RoomService_DeleteRoom_ThrowsException_WhenRoomNotFound() {
-        BigInteger roomId = BigInteger.ONE;
-
         when(roomRepository.existsById(roomId)).thenReturn(false);
 
         assertThrows(RoomNotFoundException.class, () -> roomService.deleteRoom(roomId));
