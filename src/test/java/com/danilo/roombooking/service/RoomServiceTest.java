@@ -4,6 +4,7 @@ import com.danilo.roombooking.domain.Amenity;
 import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room.RoomStatus;
 import com.danilo.roombooking.domain.room.RoomType;
+import com.danilo.roombooking.dto.RoomFilterDTO;
 import com.danilo.roombooking.dto.RoomRequestDTO;
 import com.danilo.roombooking.dto.RoomResponseDTO;
 import com.danilo.roombooking.repository.AmenityRepository;
@@ -12,11 +13,14 @@ import com.danilo.roombooking.service.room.RoomNotFoundException;
 import com.danilo.roombooking.service.room.RoomService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -37,30 +41,6 @@ public class RoomServiceTest {
 
     @InjectMocks
     private RoomService roomService;
-
-    private Room createRoom(BigInteger roomId, String identifier, String name, int capacity) {
-        Room room = new Room();
-        room.setId(roomId);
-        room.setIdentifier(identifier);
-        room.setName(name);
-        room.setDescription("A large classroom");
-        room.setCapacity(capacity);
-        room.setType(RoomType.STANDARD_CLASSROOM);
-        room.setStatus(RoomStatus.AVAILABLE);
-        room.setAmenities(new HashSet<>());
-        return room;
-    }
-
-    private RoomRequestDTO createRoomRequestDTO(String identifier, String name, int capacity) {
-        return new RoomRequestDTO(identifier, name, "A large classroom", capacity,
-            RoomStatus.AVAILABLE, RoomType.STANDARD_CLASSROOM, List.of(BigInteger.ONE));
-    }
-
-    private Amenity createAmenity(BigInteger amenityId) {
-        Amenity amenity = new Amenity();
-        amenity.setId(amenityId);
-        return amenity;
-    }
 
     @Test
     public void RoomService_CreateRoom_ReturnsCreatedRoom() {
@@ -109,6 +89,122 @@ public class RoomServiceTest {
         assertEquals("Classroom 101", response.get().name());
 
         verify(roomRepository).findByIdentifier(identifier);
+    }
+
+    @Test
+    public void RoomService_getFilterRooms_NoFilters_ReturnsAllRooms() {
+        List<Room> rooms = List.of(
+            createRoom(BigInteger.ONE, "R101", "Physics Lab", 30),
+            createRoom(BigInteger.TWO, "R102", "Chemistry Lab", 25)
+        );
+
+        when(roomRepository.findAll(ArgumentMatchers.<Specification<Room>>any())).thenReturn(rooms);
+
+        RoomFilterDTO filterDTO = new RoomFilterDTO(null, null, null, null, null, null);
+        List<RoomResponseDTO> result = roomService.getFilterRooms(filterDTO);
+
+        assertEquals(2, result.size());
+        verify(roomRepository).findAll(ArgumentMatchers.<Specification<Room>>any());
+    }
+
+    @Test
+    public void RoomService_getFilterRooms_FilterByMinCapacity_ReturnsMatchingRooms() {
+        List<Room> rooms = List.of(
+            createRoom(BigInteger.ONE, "R101", "Physics Lab", 30),
+            createRoom(BigInteger.TWO, "R102", "Chemistry Lab", 40)
+        );
+
+        when(roomRepository.findAll(ArgumentMatchers.<Specification<Room>>any())).thenReturn(List.of(rooms.get(1)));
+
+        RoomFilterDTO filterDTO = new RoomFilterDTO(null, 35, null, null, null, null);
+        List<RoomResponseDTO> result = roomService.getFilterRooms(filterDTO);
+
+        assertEquals(1, result.size());
+        assertEquals("R102", result.get(0).identifier());
+        verify(roomRepository).findAll(ArgumentMatchers.<Specification<Room>>any());
+    }
+
+    @Test
+    public void RoomService_getFilterRooms_FilterByMaxCapacity_ReturnsMatchingRooms() {
+        List<Room> rooms = List.of(
+            createRoom(BigInteger.ONE, "R101", "Physics Lab", 30),
+            createRoom(BigInteger.TWO, "R102", "Chemistry Lab", 40)
+        );
+
+        when(roomRepository.findAll(ArgumentMatchers.<Specification<Room>>any())).thenReturn(List.of(rooms.get(0)));
+
+        RoomFilterDTO filterDTO = new RoomFilterDTO(null, null, 35, null, null, null);
+        List<RoomResponseDTO> result = roomService.getFilterRooms(filterDTO);
+
+        assertEquals(1, result.size());
+        assertEquals("R101", result.get(0).identifier());
+        verify(roomRepository).findAll(ArgumentMatchers.<Specification<Room>>any());
+    }
+
+    @Test
+    public void RoomService_getFilterRooms_FilterByName_ReturnsMatchingRooms() {
+        List<Room> rooms = List.of(
+            createRoom(BigInteger.ONE, "R101", "Physics Lab", 30),
+            createRoom(BigInteger.TWO, "R102", "Chemistry Lab", 25)
+        );
+
+        when(roomRepository.findAll(ArgumentMatchers.<Specification<Room>>any())).thenReturn(List.of(rooms.get(1)));
+
+        RoomFilterDTO filterDTO = new RoomFilterDTO("Chemistry", null, null, null, null, null);
+        List<RoomResponseDTO> result = roomService.getFilterRooms(filterDTO);
+
+        assertEquals(1, result.size());
+        assertEquals("Chemistry Lab", result.get(0).name());
+        verify(roomRepository).findAll(ArgumentMatchers.<Specification<Room>>any());
+    }
+
+    @Test
+    public void RoomService_getFilterRooms_FilterByStatus_ReturnsMatchingRooms() {
+        Room room1 = createRoom(BigInteger.ONE, "R101", "Physics Lab", 30);
+        room1.setStatus(RoomStatus.OCCUPIED);
+
+        Room room2 = createRoom(BigInteger.TWO, "R102", "Chemistry Lab", 25);
+        room2.setStatus(RoomStatus.AVAILABLE);
+
+        List<Room> rooms = List.of(room1, room2);
+        when(roomRepository.findAll(ArgumentMatchers.<Specification<Room>>any())).thenReturn(List.of(room2));
+
+        RoomFilterDTO filterDTO = new RoomFilterDTO(null, null, null, RoomStatus.AVAILABLE, null, null);
+        List<RoomResponseDTO> result = roomService.getFilterRooms(filterDTO);
+
+        assertEquals(1, result.size());
+        assertEquals(RoomStatus.AVAILABLE, result.get(0).status());
+        verify(roomRepository).findAll(ArgumentMatchers.<Specification<Room>>any());
+    }
+
+    @Test
+    public void RoomService_getFilterRooms_FilterByType_ReturnsMatchingRooms() {
+        Room room1 = createRoom(BigInteger.ONE, "R101", "Physics Lab", 30);
+        room1.setType(RoomType.SCIENCE_LAB);
+
+        Room room2 = createRoom(BigInteger.TWO, "R102", "Chemistry Lab", 25);
+        room2.setType(RoomType.STANDARD_CLASSROOM);
+
+        List<Room> rooms = List.of(room1, room2);
+        when(roomRepository.findAll(ArgumentMatchers.<Specification<Room>>any())).thenReturn(List.of(room1));
+
+        RoomFilterDTO filterDTO = new RoomFilterDTO(null, null, null, null, RoomType.SCIENCE_LAB, null);
+        List<RoomResponseDTO> result = roomService.getFilterRooms(filterDTO);
+
+        assertEquals(1, result.size());
+        assertEquals(RoomType.SCIENCE_LAB, result.get(0).type());
+        verify(roomRepository).findAll(ArgumentMatchers.<Specification<Room>>any());
+    }
+
+    @Test
+    public void RoomService_getFilterRooms_NoMatchingRooms_ReturnsEmptyList() {
+        when(roomRepository.findAll(ArgumentMatchers.<Specification<Room>>any())).thenReturn(Collections.emptyList());
+
+        RoomFilterDTO filterDTO = new RoomFilterDTO("Tux", 200, 300, null, null, null);
+        List<RoomResponseDTO> result = roomService.getFilterRooms(filterDTO);
+
+        assertTrue(result.isEmpty());
+        verify(roomRepository).findAll(ArgumentMatchers.<Specification<Room>>any());
     }
 
     @Test
@@ -163,5 +259,29 @@ public class RoomServiceTest {
         assertThrows(RoomNotFoundException.class, () -> roomService.deleteRoom(roomId));
 
         verify(roomRepository, never()).deleteById(roomId);
+    }
+
+    private Room createRoom(BigInteger roomId, String identifier, String name, int capacity) {
+        Room room = new Room();
+        room.setId(roomId);
+        room.setIdentifier(identifier);
+        room.setName(name);
+        room.setDescription("A large classroom");
+        room.setCapacity(capacity);
+        room.setType(RoomType.STANDARD_CLASSROOM);
+        room.setStatus(RoomStatus.AVAILABLE);
+        room.setAmenities(new HashSet<>());
+        return room;
+    }
+
+    private RoomRequestDTO createRoomRequestDTO(String identifier, String name, int capacity) {
+        return new RoomRequestDTO(identifier, name, "A large classroom", capacity,
+            RoomStatus.AVAILABLE, RoomType.STANDARD_CLASSROOM, List.of(BigInteger.ONE));
+    }
+
+    private Amenity createAmenity(BigInteger amenityId) {
+        Amenity amenity = new Amenity();
+        amenity.setId(amenityId);
+        return amenity;
     }
 }
