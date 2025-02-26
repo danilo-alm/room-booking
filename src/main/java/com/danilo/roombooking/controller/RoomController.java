@@ -9,11 +9,13 @@ import com.danilo.roombooking.dto.RoomRequestDTO;
 import com.danilo.roombooking.dto.RoomResponseDTO;
 import com.danilo.roombooking.service.room.RoomService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,40 +26,42 @@ public class RoomController {
     private final RoomService roomService;
 
     @PostMapping(ApiPaths.Room.CREATE)
-    public ResponseEntity<RoomResponseDTO> createRoom(@RequestBody  RoomRequestDTO roomRequestDTO) {
+    public ResponseEntity<RoomResponseDTO> createRoom(@RequestBody RoomRequestDTO roomRequestDTO) {
         Room room = roomService.createRoom(roomRequestDTO);
         return ResponseEntity.ok(new RoomResponseDTO(room));
     }
 
     @GetMapping(ApiPaths.Room.GET)
-    public ResponseEntity<RoomResponseDTO> getRoom(
-        @RequestParam(required = false) BigInteger id,
-        @RequestParam(required = false) String identifier
-    ) {
-        Room room;
-        if (id != null) {
-            room = roomService.getRoomById(id);
-        } else if (identifier != null) {
-            room = roomService.getRoomByIdentifier(identifier);
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Page<RoomResponseDTO>> getRooms(@PageableDefault Pageable pageable) {
+        Page<Room> rooms = roomService.getRooms(pageable);
+        return ResponseEntity.ok(rooms.map(RoomResponseDTO::new));
+    }
+
+    @GetMapping(ApiPaths.Room.GET_BY_ID)
+    public ResponseEntity<RoomResponseDTO> getRoomById(@PathVariable BigInteger id) {
+        Room room = roomService.getRoomById(id);
+        return ResponseEntity.ok(new RoomResponseDTO(room));
+    }
+
+    @GetMapping(ApiPaths.Room.GET_BY_IDENTIFIER)
+    public ResponseEntity<RoomResponseDTO> getRoomByIdentifier(@PathVariable String identifier) {
+        Room room = roomService.getRoomByIdentifier(identifier);
         return ResponseEntity.ok(new RoomResponseDTO(room));
     }
 
     @GetMapping(ApiPaths.Room.GET_FILTER)
-    public ResponseEntity<List<RoomResponseDTO>> filterRooms(
+    public ResponseEntity<Page<RoomResponseDTO>> filterRooms(
         @RequestParam(required = false) String name,
         @RequestParam(required = false) Integer minCapacity,
         @RequestParam(required = false) Integer maxCapacity,
         @RequestParam(required = false) RoomStatus status,
         @RequestParam(required = false) RoomType type,
-        @RequestParam(required = false) Set<BigInteger> amenityIds
+        @RequestParam(required = false) Set<BigInteger> amenityIds,
+        @PageableDefault Pageable pageable
     ) {
         RoomFilterDTO roomFilterDTO = new RoomFilterDTO(name, minCapacity, maxCapacity, status, type, amenityIds);
-        List<RoomResponseDTO> roomResponseDTOs = roomService.getFilterRooms(roomFilterDTO)
-            .stream().map(RoomResponseDTO::new).toList();
-        return ResponseEntity.ok(roomResponseDTOs);
+        Page<Room> rooms = roomService.getFilterRooms(roomFilterDTO, pageable);
+        return ResponseEntity.ok(rooms.map(RoomResponseDTO::new));
     }
 
     @PutMapping(ApiPaths.Room.UPDATE)

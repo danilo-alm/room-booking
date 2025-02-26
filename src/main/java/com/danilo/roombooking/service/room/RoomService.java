@@ -8,13 +8,14 @@ import com.danilo.roombooking.repository.AmenityRepository;
 import com.danilo.roombooking.repository.RoomRepository;
 import com.danilo.roombooking.specification.RoomSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,6 +43,10 @@ public class RoomService {
         return roomRepository.saveAndFlush(room);
     }
 
+    public Page<Room> getRooms(Pageable pageable) {
+        return roomRepository.findAll(pageable);
+    }
+
     public Room getRoomById(BigInteger id) {
         return roomRepository.findById(id).orElseThrow(RoomNotFoundException::new);
     }
@@ -51,7 +56,7 @@ public class RoomService {
     }
 
     @Transactional(readOnly = true)
-    public List<Room> getFilterRooms(RoomFilterDTO filterDTO) {
+    public Page<Room> getFilterRooms(RoomFilterDTO filterDTO, Pageable pageable) {
         Specification<Room> spec = Specification
             .where(RoomSpecification.hasCapacityGreaterThanOrEqualTo(filterDTO.minCapacity()))
             .and(RoomSpecification.hasCapacityLessThanOrEqualTo(filterDTO.maxCapacity()))
@@ -60,7 +65,7 @@ public class RoomService {
             .and(RoomSpecification.hasType(filterDTO.type()))
             .and(RoomSpecification.hasAmenities(filterDTO.amenityIds()));
 
-        return roomRepository.findAll(spec);
+        return roomRepository.findAll(spec, pageable);
     }
 
     @Transactional

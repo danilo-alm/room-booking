@@ -6,11 +6,13 @@ import com.danilo.roombooking.dto.AmenityRequestDTO;
 import com.danilo.roombooking.dto.AmenityResponseDTO;
 import com.danilo.roombooking.service.amenity.AmenityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.util.List;
 
 @RestController
 @RequestMapping(ApiPaths.Amenity.ROOT)
@@ -25,10 +27,17 @@ public class AmenityController {
     }
 
     @GetMapping(ApiPaths.Amenity.GET)
-    public ResponseEntity<List<AmenityResponseDTO>> getAmenities(@RequestParam(required = false) String prefix) {
-        List<AmenityResponseDTO> amenityResponseDTOs = amenityService.getAmenities(prefix)
-            .stream().map(AmenityResponseDTO::new).toList();
-        return ResponseEntity.ok(amenityResponseDTOs);
+    public ResponseEntity<Page<AmenityResponseDTO>> getAmenities(
+        @RequestParam(required = false) String prefix,
+        @PageableDefault Pageable pageable
+    ) {
+        Page<Amenity> amenities;
+        if (prefix != null) {
+            amenities = amenityService.getAmenitiesWithPrefix(prefix, pageable);
+        } else {
+            amenities = amenityService.getAmenities(pageable);
+        }
+        return ResponseEntity.ok(amenities.map(AmenityResponseDTO::new));
     }
 
     @DeleteMapping(ApiPaths.Amenity.DELETE)
