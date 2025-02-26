@@ -5,7 +5,6 @@ import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room.RoomStatus;
 import com.danilo.roombooking.domain.room.RoomType;
 import com.danilo.roombooking.dto.RoomRequestDTO;
-import com.danilo.roombooking.dto.RoomResponseDTO;
 import com.danilo.roombooking.repository.AmenityRepository;
 import com.danilo.roombooking.repository.RoomRepository;
 import com.danilo.roombooking.service.room.RoomNotFoundException;
@@ -47,22 +46,22 @@ public class RoomServiceTest {
     void setUp() {
         roomId = BigInteger.ONE;
 
-        room = createRoom(BigInteger.ONE, "R101", "Classroom 101", 30);
-        room.setType(RoomType.SCIENCE_LAB);
-
         requestDTO = createRoomRequestDTO("R101", "Classroom 101", 50);
+
+        room = createRoom(BigInteger.ONE, "R101", "Classroom 101", 50);
+        room.setType(RoomType.SCIENCE_LAB);
     }
 
     @Test
     public void RoomService_CreateRoom_ReturnsCreatedRoom() {
         when(roomRepository.saveAndFlush(any(Room.class))).thenReturn(room);
 
-        RoomResponseDTO response = roomService.createRoom(requestDTO);
+        Room response = roomService.createRoom(requestDTO);
 
         assertNotNull(response);
-        assertEquals("R101", response.identifier());
-        assertEquals("Classroom 101", response.name());
-        assertEquals(50, response.capacity());
+        assertEquals("R101", response.getIdentifier());
+        assertEquals("Classroom 101", response.getName());
+        assertEquals(50, response.getCapacity());
 
         verify(roomRepository).saveAndFlush(any(Room.class));
     }
@@ -71,11 +70,11 @@ public class RoomServiceTest {
     public void RoomService_GetRoom_ById_ReturnsRoom() {
         when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
 
-        Optional<RoomResponseDTO> response = roomService.getRoom(roomId, null);
+        Room response = roomService.getRoomById(roomId);
 
-        assertTrue(response.isPresent());
-        assertEquals("R101", response.get().identifier());
-        assertEquals("Classroom 101", response.get().name());
+        assertNotNull(response);
+        assertEquals("R101", response.getIdentifier());
+        assertEquals("Classroom 101", response.getName());
 
         verify(roomRepository).findById(roomId);
     }
@@ -85,11 +84,11 @@ public class RoomServiceTest {
         String identifier = room.getIdentifier();
         when(roomRepository.findByIdentifier(identifier)).thenReturn(Optional.of(room));
 
-        Optional<RoomResponseDTO> response = roomService.getRoom(null, identifier);
+        Room response = roomService.getRoomByIdentifier(identifier);
 
-        assertTrue(response.isPresent());
-        assertEquals("R101", response.get().identifier());
-        assertEquals("Classroom 101", response.get().name());
+        assertNotNull(response);
+        assertEquals("R101", response.getIdentifier());
+        assertEquals("Classroom 101", response.getName());
 
         verify(roomRepository).findByIdentifier(identifier);
     }
@@ -104,12 +103,12 @@ public class RoomServiceTest {
         when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
         when(amenityRepository.findByIdIn(anyCollection())).thenReturn(List.of(amenity));
 
-        RoomResponseDTO response = roomService.updateRoom(roomId, requestDTO);
+        Room response = roomService.updateRoom(roomId, requestDTO);
 
         assertNotNull(response);
-        assertEquals("R101", response.identifier());
-        assertEquals("Updated Classroom", response.name());
-        assertEquals(60, response.capacity());
+        assertEquals("R101", response.getIdentifier());
+        assertEquals("Updated Classroom", response.getName());
+        assertEquals(60, response.getCapacity());
 
         verify(roomRepository).findById(roomId);
     }

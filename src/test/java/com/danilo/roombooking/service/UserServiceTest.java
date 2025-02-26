@@ -3,7 +3,6 @@ package com.danilo.roombooking.service;
 import com.danilo.roombooking.domain.User;
 import com.danilo.roombooking.domain.authority.Authority;
 import com.danilo.roombooking.dto.UserRequestDTO;
-import com.danilo.roombooking.dto.UserResponseDTO;
 import com.danilo.roombooking.repository.UserRepository;
 import com.danilo.roombooking.service.user.UserNotFoundException;
 import com.danilo.roombooking.service.user.UserService;
@@ -57,45 +56,39 @@ public class UserServiceTest {
         when(passwordEncoder.encode(userDTO.password())).thenReturn("encodedPassword");
         when(userRepository.saveAndFlush(any(User.class))).thenReturn(user);
 
-        UserResponseDTO response = userService.createUser(userDTO);
+        User response = userService.createUser(userDTO);
 
         assertNotNull(response);
-        assertEquals(user.getUsername(), response.username());
-        assertEquals(user.getEmail(), response.email());
+        assertEquals(user.getUsername(), response.getUsername());
+        assertEquals(user.getEmail(), response.getEmail());
         verify(userRepository).saveAndFlush(any(User.class));
     }
 
     @Test
-    public void UserService_GetUser_UsernameParam_ReturnsUser() {
+    public void UserService_GetById_ReturnsUser() {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        Optional<UserResponseDTO> response = userService.getUser(user.getId(), null, null);
+        User response = userService.getById(user.getId());
 
-        assertTrue(response.isPresent());
-        assertEquals(user.getUsername(), response.get().username());
+        assertNotNull(response);
+        assertEquals(user.getUsername(), response.getUsername());
     }
 
     @Test
-    public void UserService_GetUser_IdParam_ReturnsUser() {
+    public void UserService_GetByUsername_ReturnsUser() {
         when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
-        Optional<UserResponseDTO> response = userService.getUser(null, user.getUsername(), null);
+        User response = userService.getByUsername(user.getUsername());
 
-        assertTrue(response.isPresent());
-        assertEquals(user.getEmail(), response.get().email());
+        assertNotNull(response);
+        assertEquals(user.getEmail(), response.getEmail());
     }
 
     @Test
-    public void UserService_GetUser_EmailParam_ReturnsUser() {
+    public void UserService_GetByEmail_ReturnsUser() {
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        Optional<UserResponseDTO> response = userService.getUser(null, null, user.getEmail());
+        User response = userService.getByEmail(user.getEmail());
 
-        assertTrue(response.isPresent());
-        assertEquals(user.getUsername(), response.get().username());
-    }
-
-    @Test
-    public void UserService_GetUser_MultipleParams_ReturnsEmpty() {
-        Optional<UserResponseDTO> response = userService.getUser(BigInteger.ONE, "testUser", "test@example.com");
-        assertFalse(response.isPresent());
+        assertNotNull(response);
+        assertEquals(user.getUsername(), response.getUsername());
     }
 
     @Test

@@ -3,6 +3,8 @@ package com.danilo.roombooking.repository;
 import com.danilo.roombooking.domain.Amenity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -51,18 +53,18 @@ public class AmenityRepositoryTest extends AbstractRepositoryTest {
         Amenity amenity2 = createAndSaveAmenity("Projection Screen");
         createAndSaveAmenity("Whiteboard");
 
-        List<Amenity> amenities = amenityRepository.findByNameStartingWithIgnoreCase("proj");
+        Page<Amenity> amenities = amenityRepository.findByNameStartingWithIgnoreCase("proj", Pageable.unpaged());
 
-        assertEquals(2, amenities.size());
-        assertTrue(amenities.contains(amenity1));
-        assertTrue(amenities.contains(amenity2));
+        assertEquals(2, amenities.getTotalElements());
+        assertTrue(amenities.getContent().contains(amenity1));
+        assertTrue(amenities.getContent().contains(amenity2));
     }
 
     @Test
     public void AmenityRepository_FindByNameStartingWithIgnoreCase_ReturnsEmptyList_WhenNoMatch() {
         createAndSaveAmenity("Whiteboard");
 
-        List<Amenity> amenities = amenityRepository.findByNameStartingWithIgnoreCase("comp");
+        Page<Amenity> amenities = amenityRepository.findByNameStartingWithIgnoreCase("comp", Pageable.unpaged());
 
         assertTrue(amenities.isEmpty());
     }
