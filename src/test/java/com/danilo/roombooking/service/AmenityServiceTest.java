@@ -2,7 +2,6 @@ package com.danilo.roombooking.service;
 
 import com.danilo.roombooking.domain.Amenity;
 import com.danilo.roombooking.dto.AmenityRequestDTO;
-import com.danilo.roombooking.dto.AmenityResponseDTO;
 import com.danilo.roombooking.repository.AmenityRepository;
 import com.danilo.roombooking.service.amenity.AmenityNotFoundException;
 import com.danilo.roombooking.service.amenity.AmenityService;
@@ -11,6 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -36,60 +38,60 @@ public class AmenityServiceTest {
 
         when(amenityRepository.save(any(Amenity.class))).thenReturn(amenity);
 
-        AmenityResponseDTO response = amenityService.createAmenity(requestDTO);
+        Amenity response = amenityService.createAmenity(requestDTO);
 
         assertNotNull(response);
-        assertEquals("Projector", response.name());
+        assertEquals("Projector", response.getName());
 
         verify(amenityRepository).save(any(Amenity.class));
     }
 
     @Test
-    public void AmenityService_GetAmenities_NoPrefix_ReturnsAllAmenities() {
+    public void AmenityService_GetAmenities_ReturnsAllAmenities() {
         Amenity amenity = new Amenity();
         amenity.setName("Whiteboard");
 
-        when(amenityRepository.findByNameStartingWithIgnoreCase("wh"))
-            .thenReturn(List.of(amenity));
+        when(amenityRepository.findAll(Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(amenity)));
 
-        List<AmenityResponseDTO> response = amenityService.getAmenities("wh");
+        Page<Amenity> response = amenityService.getAmenities(Pageable.unpaged());
 
         assertNotNull(response);
-        assertEquals(1, response.size());
-        assertEquals("Whiteboard", response.get(0).name());
+        assertEquals(1, response.getTotalPages());
+        assertEquals("Whiteboard", response.getContent().get(0).getName());
 
         verify(amenityRepository, never()).findAll();
-        verify(amenityRepository).findByNameStartingWithIgnoreCase("wh");
+        verify(amenityRepository).findAll(Pageable.unpaged());
     }
 
     @Test
-    public void AmenityService_GetAmenities_WithPrefix_ReturnsAmenitiesWithPrefix() {
+    public void AmenityService_GetAmenitiesWithPrefix_ReturnsAmenitiesWithPrefix() {
         Amenity amenity = new Amenity();
         amenity.setName("Whiteboard");
 
-        when(amenityRepository.findByNameStartingWithIgnoreCase("wh"))
-            .thenReturn(List.of(amenity));
+        when(amenityRepository.findByNameStartingWithIgnoreCase("wh", Pageable.unpaged()))
+            .thenReturn(new PageImpl<>(List.of(amenity)));
 
-        List<AmenityResponseDTO> response = amenityService.getAmenities("wh");
+        Page<Amenity> response = amenityService.getAmenitiesWithPrefix("wh", Pageable.unpaged());
 
         assertNotNull(response);
-        assertEquals(1, response.size());
-        assertEquals("Whiteboard", response.get(0).name());
+        assertEquals(1, response.getTotalElements());
+        assertEquals("Whiteboard", response.getContent().get(0).getName());
 
         verify(amenityRepository, never()).findAll();
-        verify(amenityRepository).findByNameStartingWithIgnoreCase("wh");
+        verify(amenityRepository).findByNameStartingWithIgnoreCase("wh", Pageable.unpaged());
     }
 
     @Test
-    public void AmenityService_GetAmenities_WithPrefix_ReturnsEmptyList() {
-        when(amenityRepository.findByNameStartingWithIgnoreCase("wh")).thenReturn(List.of());
+    public void AmenityService_GetAmenitiesWithPrefix_ReturnsEmptyList() {
+        when(amenityRepository.findByNameStartingWithIgnoreCase("wh", Pageable.unpaged()))
+            .thenReturn(Page.empty());
 
-        List<AmenityResponseDTO> result = amenityService.getAmenities("wh");
+        Page<Amenity> response = amenityService.getAmenitiesWithPrefix("wh", Pageable.unpaged());
 
-        assertNotNull(result);
-        assertEquals(0, result.size());
+        assertNotNull(response);
+        assertEquals(0, response.getTotalElements());
 
-        verify(amenityRepository).findByNameStartingWithIgnoreCase("wh");
+        verify(amenityRepository).findByNameStartingWithIgnoreCase("wh", Pageable.unpaged());
     }
 
     @Test
