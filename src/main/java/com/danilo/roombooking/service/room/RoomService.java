@@ -4,7 +4,6 @@ import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room_amenity.RoomAmenity;
 import com.danilo.roombooking.dto.RoomFilterDTO;
 import com.danilo.roombooking.dto.RoomRequestDTO;
-import com.danilo.roombooking.dto.RoomResponseDTO;
 import com.danilo.roombooking.repository.AmenityRepository;
 import com.danilo.roombooking.repository.RoomRepository;
 import com.danilo.roombooking.specification.RoomSpecification;
@@ -14,9 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public class RoomService {
     private final AmenityRepository amenityRepository;
 
     @Transactional
-    public RoomResponseDTO createRoom(RoomRequestDTO roomRequestDTO) {
+    public Room createRoom(RoomRequestDTO roomRequestDTO) {
         Room room = Room.builder()
             .identifier(roomRequestDTO.identifier())
             .name(roomRequestDTO.name())
@@ -39,23 +39,19 @@ public class RoomService {
             getRoomAmenitySet(room, roomRequestDTO.amenitiesIds())
         );
 
-        roomRepository.saveAndFlush(room);
-        return new RoomResponseDTO(room);
+        return roomRepository.saveAndFlush(room);
+    }
+
+    public Room getRoomById(BigInteger id) {
+        return roomRepository.findById(id).orElseThrow(RoomNotFoundException::new);
+    }
+
+    public Room getRoomByIdentifier(String identifier) {
+        return roomRepository.findByIdentifier(identifier).orElseThrow(RoomNotFoundException::new);
     }
 
     @Transactional(readOnly = true)
-    public Optional<RoomResponseDTO> getRoom(BigInteger id, String identifier) {
-        long nonNullCount = Stream.of(id, identifier).filter(Objects::nonNull).count();
-        if (nonNullCount != 1) {
-            return Optional.empty();
-        }
-        if (id != null) {
-            return Optional.of(this.getRoomById(id));
-        }
-        return Optional.of(this.getRoomByIdentifier(identifier));
-    }
-
-    public List<RoomResponseDTO> getFilterRooms(RoomFilterDTO filterDTO) {
+    public List<Room> getFilterRooms(RoomFilterDTO filterDTO) {
         Specification<Room> spec = Specification
             .where(RoomSpecification.hasCapacityGreaterThanOrEqualTo(filterDTO.minCapacity()))
             .and(RoomSpecification.hasCapacityLessThanOrEqualTo(filterDTO.maxCapacity()))
@@ -64,13 +60,11 @@ public class RoomService {
             .and(RoomSpecification.hasType(filterDTO.type()))
             .and(RoomSpecification.hasAmenities(filterDTO.amenityIds()));
 
-        return roomRepository.findAll(spec).stream()
-            .map(RoomResponseDTO::new)
-            .toList();
+        return roomRepository.findAll(spec);
     }
 
     @Transactional
-    public RoomResponseDTO updateRoom(BigInteger roomId, RoomRequestDTO roomRequestDTO) {
+    public Room updateRoom(BigInteger roomId, RoomRequestDTO roomRequestDTO) {
         Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
 
         if (roomRequestDTO.identifier() != null) {
@@ -95,7 +89,7 @@ public class RoomService {
             room.setAmenities(getRoomAmenitySet(room, roomRequestDTO.amenitiesIds()));
         }
 
-        return new RoomResponseDTO(room);
+        return room;
     }
 
     @Transactional
@@ -109,15 +103,5 @@ public class RoomService {
     private Set<RoomAmenity> getRoomAmenitySet(Room room, Collection<BigInteger> amenitiesIds) {
         return amenityRepository.findByIdIn(amenitiesIds).stream().map(amenity ->
             new RoomAmenity(room, amenity)).collect(Collectors.toSet());
-    }
-
-    private RoomResponseDTO getRoomById(BigInteger id) {
-        Room room = roomRepository.findById(id).orElseThrow(RoomNotFoundException::new);
-        return new RoomResponseDTO(room);
-    }
-
-    private RoomResponseDTO getRoomByIdentifier(String identifier) {
-        Room room = roomRepository.findByIdentifier(identifier).orElseThrow(RoomNotFoundException::new);
-        return new RoomResponseDTO(room);
     }
 }

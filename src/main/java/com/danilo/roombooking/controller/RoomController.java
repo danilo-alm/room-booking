@@ -1,6 +1,7 @@
 package com.danilo.roombooking.controller;
 
 import com.danilo.roombooking.config.ApiPaths;
+import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room.RoomStatus;
 import com.danilo.roombooking.domain.room.RoomType;
 import com.danilo.roombooking.dto.RoomFilterDTO;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -25,7 +25,8 @@ public class RoomController {
 
     @PostMapping(ApiPaths.Room.CREATE)
     public ResponseEntity<RoomResponseDTO> createRoom(@RequestBody  RoomRequestDTO roomRequestDTO) {
-        return ResponseEntity.ok(roomService.createRoom(roomRequestDTO));
+        Room room = roomService.createRoom(roomRequestDTO);
+        return ResponseEntity.ok(new RoomResponseDTO(room));
     }
 
     @GetMapping(ApiPaths.Room.GET)
@@ -33,8 +34,15 @@ public class RoomController {
         @RequestParam(required = false) BigInteger id,
         @RequestParam(required = false) String identifier
     ) {
-        Optional<RoomResponseDTO> roomResponseDTO = roomService.getRoom(id, identifier);
-        return roomResponseDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.badRequest().build());
+        Room room;
+        if (id != null) {
+            room = roomService.getRoomById(id);
+        } else if (identifier != null) {
+            room = roomService.getRoomByIdentifier(identifier);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(new RoomResponseDTO(room));
     }
 
     @GetMapping(ApiPaths.Room.GET_FILTER)
@@ -47,13 +55,18 @@ public class RoomController {
         @RequestParam(required = false) Set<BigInteger> amenityIds
     ) {
         RoomFilterDTO roomFilterDTO = new RoomFilterDTO(name, minCapacity, maxCapacity, status, type, amenityIds);
-        return ResponseEntity.ok(roomService.getFilterRooms(roomFilterDTO));
+        List<RoomResponseDTO> roomResponseDTOs = roomService.getFilterRooms(roomFilterDTO)
+            .stream().map(RoomResponseDTO::new).toList();
+        return ResponseEntity.ok(roomResponseDTOs);
     }
 
     @PutMapping(ApiPaths.Room.UPDATE)
-    public ResponseEntity<RoomResponseDTO> updateRoom(@PathVariable("id") BigInteger id,
-                                                      @RequestBody RoomRequestDTO roomRequestDTO) {
-        return ResponseEntity.ok(roomService.updateRoom(id, roomRequestDTO));
+    public ResponseEntity<RoomResponseDTO> updateRoom(
+        @PathVariable("id") BigInteger id,
+        @RequestBody RoomRequestDTO roomRequestDTO
+    ) {
+        Room updatedRoom = roomService.updateRoom(id, roomRequestDTO);
+        return ResponseEntity.ok(new RoomResponseDTO(updatedRoom));
     }
 
     @DeleteMapping(ApiPaths.Room.DELETE)

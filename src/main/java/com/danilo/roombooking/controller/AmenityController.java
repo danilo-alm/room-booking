@@ -1,6 +1,7 @@
 package com.danilo.roombooking.controller;
 
 import com.danilo.roombooking.config.ApiPaths;
+import com.danilo.roombooking.domain.Amenity;
 import com.danilo.roombooking.dto.AmenityRequestDTO;
 import com.danilo.roombooking.dto.AmenityResponseDTO;
 import com.danilo.roombooking.service.amenity.AmenityService;
@@ -19,13 +20,15 @@ public class AmenityController {
 
     @PostMapping(ApiPaths.Amenity.CREATE)
     public ResponseEntity<AmenityResponseDTO> createAmenity(@RequestBody AmenityRequestDTO amenityRequestDTO) {
-        return ResponseEntity.ok(amenityService.createAmenity(amenityRequestDTO));
+        Amenity amenity = amenityService.createAmenity(amenityRequestDTO);
+        return ResponseEntity.ok(new AmenityResponseDTO(amenity));
     }
 
     @GetMapping(ApiPaths.Amenity.GET)
-    public ResponseEntity<List<AmenityResponseDTO>> getAmenities(
-        @RequestParam(required = false) String prefix) {
-        return ResponseEntity.ok(amenityService.getAmenities(prefix));
+    public ResponseEntity<List<AmenityResponseDTO>> getAmenities(@RequestParam(required = false) String prefix) {
+        List<AmenityResponseDTO> amenityResponseDTOs = amenityService.getAmenities(prefix)
+            .stream().map(AmenityResponseDTO::new).toList();
+        return ResponseEntity.ok(amenityResponseDTOs);
     }
 
     @DeleteMapping(ApiPaths.Amenity.DELETE)
