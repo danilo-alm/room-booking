@@ -1,5 +1,6 @@
 package com.danilo.roombooking.domain.room;
 
+import com.danilo.roombooking.domain.Booking;
 import com.danilo.roombooking.domain.room_amenity.RoomAmenity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -50,6 +51,9 @@ public class Room {
 
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<RoomAmenity> amenities;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Booking> bookings;
 
     @CreationTimestamp
     @Column(name = "CreatedAt", columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")

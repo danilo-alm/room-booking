@@ -44,6 +44,9 @@ public class User {
     @Column(name = "FullName", columnDefinition = "VARCHAR(100) NOT NULL")
     private String fullName;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Booking> bookings;
+
     @CreationTimestamp
     @Column(name = "CreatedAt", columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
     private Timestamp createdAt;
