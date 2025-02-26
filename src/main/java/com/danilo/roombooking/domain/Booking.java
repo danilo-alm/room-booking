@@ -31,11 +31,11 @@ public class Booking {
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
     private BigInteger id;
 
-    @JoinColumn(name = "roomId", columnDefinition = "BIGINT UNSIGNED NOT NULL")
+    @JoinColumn(name = "roomId", columnDefinition = "BIGINT UNSIGNED")
     @ManyToOne(fetch = FetchType.LAZY)
     private Room room;
 
-    @JoinColumn(name = "UserId", columnDefinition = "BIGINT UNSIGNED NOT NULL")
+    @JoinColumn(name = "UserId", columnDefinition = "BIGINT UNSIGNED")
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
