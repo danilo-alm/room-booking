@@ -19,7 +19,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public User createUser(UserRequestDTO userDTO) {
+    public User create(UserRequestDTO userDTO) {
         String encryptedPassword = passwordEncoder.encode(userDTO.password());
 
         User user = User.builder()
@@ -51,7 +51,7 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(BigInteger id) {
+    public void delete(BigInteger id) {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException();
         }

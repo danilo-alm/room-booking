@@ -52,11 +52,11 @@ public class UserServiceTest {
     }
 
     @Test
-    public void UserService_CreateUser_CreatesUser() {
+    public void UserService_Create_CreatesUser() {
         when(passwordEncoder.encode(userDTO.password())).thenReturn("encodedPassword");
         when(userRepository.saveAndFlush(any(User.class))).thenReturn(user);
 
-        User response = userService.createUser(userDTO);
+        User response = userService.create(userDTO);
 
         assertNotNull(response);
         assertEquals(user.getUsername(), response.getUsername());
@@ -92,17 +92,17 @@ public class UserServiceTest {
     }
 
     @Test
-    public void UserService_DeleteById_DeletesUser() {
+    public void UserService_Delete_DeletesUser() {
         when(userRepository.existsById(user.getId())).thenReturn(true);
         doNothing().when(userRepository).deleteById(user.getId());
 
-        assertDoesNotThrow(() -> userService.deleteUser(user.getId()));
+        assertDoesNotThrow(() -> userService.delete(user.getId()));
         verify(userRepository).deleteById(user.getId());
     }
 
     @Test
-    void UserService_DeleteById_ThrowsException() {
+    void UserService_Delete_ThrowsException() {
         when(userRepository.existsById(user.getId())).thenReturn(false);
-        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(user.getId()));
+        assertThrows(UserNotFoundException.class, () -> userService.delete(user.getId()));
     }
 }

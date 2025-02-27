@@ -26,7 +26,7 @@ public class RoomService {
     private final AmenityRepository amenityRepository;
 
     @Transactional
-    public Room createRoom(RoomRequestDTO roomRequestDTO) {
+    public Room create(RoomRequestDTO roomRequestDTO) {
         Room room = Room.builder()
             .identifier(roomRequestDTO.identifier())
             .name(roomRequestDTO.name())
@@ -43,20 +43,20 @@ public class RoomService {
         return roomRepository.saveAndFlush(room);
     }
 
-    public Page<Room> getRooms(Pageable pageable) {
+    public Page<Room> getAll(Pageable pageable) {
         return roomRepository.findAll(pageable);
     }
 
-    public Room getRoomById(BigInteger id) {
+    public Room getById(BigInteger id) {
         return roomRepository.findById(id).orElseThrow(RoomNotFoundException::new);
     }
 
-    public Room getRoomByIdentifier(String identifier) {
+    public Room getByIdentifier(String identifier) {
         return roomRepository.findByIdentifier(identifier).orElseThrow(RoomNotFoundException::new);
     }
 
     @Transactional(readOnly = true)
-    public Page<Room> getFilterRooms(RoomFilterDTO filterDTO, Pageable pageable) {
+    public Page<Room> getFilter(RoomFilterDTO filterDTO, Pageable pageable) {
         Specification<Room> spec = Specification
             .where(RoomSpecification.hasCapacityGreaterThanOrEqualTo(filterDTO.minCapacity()))
             .and(RoomSpecification.hasCapacityLessThanOrEqualTo(filterDTO.maxCapacity()))
@@ -69,7 +69,7 @@ public class RoomService {
     }
 
     @Transactional
-    public Room updateRoom(BigInteger roomId, RoomRequestDTO roomRequestDTO) {
+    public Room update(BigInteger roomId, RoomRequestDTO roomRequestDTO) {
         Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
 
         if (roomRequestDTO.identifier() != null) {
@@ -98,7 +98,7 @@ public class RoomService {
     }
 
     @Transactional
-    public void deleteRoom(BigInteger id) {
+    public void delete(BigInteger id) {
         if (!roomRepository.existsById(id)) {
             throw new RoomNotFoundException();
         }

@@ -21,7 +21,7 @@ public class UserController {
 
     @PostMapping(ApiPaths.User.CREATE)
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserRequestDTO userDTO) {
-        UserResponseDTO user = new UserResponseDTO(userService.createUser(userDTO));
+        UserResponseDTO user = new UserResponseDTO(userService.create(userDTO));
         URI loc = UriComponentsBuilder.fromPath(ApiPaths.User.GET)
             .queryParam("id", user.id())
             .build().toUri();
@@ -49,7 +49,7 @@ public class UserController {
 
     @DeleteMapping(ApiPaths.User.DELETE)
     public ResponseEntity<Void> deleteUser(@PathVariable("id") BigInteger id) {
-        userService.deleteUser(id);
+        userService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

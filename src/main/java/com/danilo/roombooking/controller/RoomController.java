@@ -27,25 +27,25 @@ public class RoomController {
 
     @PostMapping(ApiPaths.Room.CREATE)
     public ResponseEntity<RoomResponseDTO> createRoom(@RequestBody RoomRequestDTO roomRequestDTO) {
-        Room room = roomService.createRoom(roomRequestDTO);
+        Room room = roomService.create(roomRequestDTO);
         return ResponseEntity.ok(new RoomResponseDTO(room));
     }
 
     @GetMapping(ApiPaths.Room.GET)
     public ResponseEntity<Page<RoomResponseDTO>> getRooms(@PageableDefault Pageable pageable) {
-        Page<Room> rooms = roomService.getRooms(pageable);
+        Page<Room> rooms = roomService.getAll(pageable);
         return ResponseEntity.ok(rooms.map(RoomResponseDTO::new));
     }
 
     @GetMapping(ApiPaths.Room.GET_BY_ID)
     public ResponseEntity<RoomResponseDTO> getRoomById(@PathVariable BigInteger id) {
-        Room room = roomService.getRoomById(id);
+        Room room = roomService.getById(id);
         return ResponseEntity.ok(new RoomResponseDTO(room));
     }
 
     @GetMapping(ApiPaths.Room.GET_BY_IDENTIFIER)
     public ResponseEntity<RoomResponseDTO> getRoomByIdentifier(@PathVariable String identifier) {
-        Room room = roomService.getRoomByIdentifier(identifier);
+        Room room = roomService.getByIdentifier(identifier);
         return ResponseEntity.ok(new RoomResponseDTO(room));
     }
 
@@ -60,7 +60,7 @@ public class RoomController {
         @PageableDefault Pageable pageable
     ) {
         RoomFilterDTO roomFilterDTO = new RoomFilterDTO(name, minCapacity, maxCapacity, status, type, amenityIds);
-        Page<Room> rooms = roomService.getFilterRooms(roomFilterDTO, pageable);
+        Page<Room> rooms = roomService.getFilter(roomFilterDTO, pageable);
         return ResponseEntity.ok(rooms.map(RoomResponseDTO::new));
     }
 
@@ -69,13 +69,13 @@ public class RoomController {
         @PathVariable("id") BigInteger id,
         @RequestBody RoomRequestDTO roomRequestDTO
     ) {
-        Room updatedRoom = roomService.updateRoom(id, roomRequestDTO);
+        Room updatedRoom = roomService.update(id, roomRequestDTO);
         return ResponseEntity.ok(new RoomResponseDTO(updatedRoom));
     }
 
     @DeleteMapping(ApiPaths.Room.DELETE)
     public ResponseEntity<Void> deleteRoom(@PathVariable BigInteger id) {
-        roomService.deleteRoom(id);
+        roomService.delete(id);
         return ResponseEntity.noContent().build();
     }
 

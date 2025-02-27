@@ -15,21 +15,21 @@ import java.math.BigInteger;
 public class AmenityService {
     private final AmenityRepository amenityRepository;
 
-    public Amenity createAmenity(AmenityRequestDTO amenityRequestDTO) {
+    public Amenity create(AmenityRequestDTO amenityRequestDTO) {
         Amenity amenity = new Amenity();
         amenity.setName(amenityRequestDTO.name());
         return amenityRepository.save(amenity);
     }
 
-    public Page<Amenity> getAmenities(Pageable pageable) {
+    public Page<Amenity> getAll(Pageable pageable) {
         return amenityRepository.findAll(pageable);
     }
 
-    public Page<Amenity> getAmenitiesWithPrefix(String prefix, Pageable pageable) {
+    public Page<Amenity> getWithPrefix(String prefix, Pageable pageable) {
         return amenityRepository.findByNameStartingWithIgnoreCase(prefix, pageable);
     }
 
-    public void deleteAmenity(BigInteger id) {
+    public void delete(BigInteger id) {
         if (!amenityRepository.existsById(id)) {
             throw new AmenityNotFoundException();
         }
