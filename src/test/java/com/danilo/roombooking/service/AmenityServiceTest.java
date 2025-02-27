@@ -31,7 +31,7 @@ public class AmenityServiceTest {
     private AmenityService amenityService;
 
     @Test
-    public void AmenityService_CreateAmenity_ReturnsCreatedAmenity() {
+    public void AmenityService_Create_ReturnsCreatedAmenity() {
         AmenityRequestDTO requestDTO = new AmenityRequestDTO("Projector");
         Amenity amenity = new Amenity();
         amenity.setName("Projector");
@@ -47,7 +47,7 @@ public class AmenityServiceTest {
     }
 
     @Test
-    public void AmenityService_GetAmenities_ReturnsAllAmenities() {
+    public void AmenityService_GetAll_ReturnsAllAmenities() {
         Amenity amenity = new Amenity();
         amenity.setName("Whiteboard");
 
@@ -64,7 +64,7 @@ public class AmenityServiceTest {
     }
 
     @Test
-    public void AmenityService_GetAmenitiesWithPrefix_ReturnsAmenitiesWithPrefix() {
+    public void AmenityService_GetWithPrefix_ReturnsAmenitiesWithPrefix() {
         Amenity amenity = new Amenity();
         amenity.setName("Whiteboard");
 
@@ -82,7 +82,7 @@ public class AmenityServiceTest {
     }
 
     @Test
-    public void AmenityService_GetAmenitiesWithPrefix_ReturnsEmptyList() {
+    public void AmenityService_GetWithPrefix_ReturnsEmptyList() {
         when(amenityRepository.findByNameStartingWithIgnoreCase("wh", Pageable.unpaged()))
             .thenReturn(Page.empty());
 
@@ -95,7 +95,7 @@ public class AmenityServiceTest {
     }
 
     @Test
-    public void AmenityService_DeleteAmenity_DeletesAmenity() {
+    public void AmenityService_Delete_DeletesAmenity() {
         BigInteger amenityId = BigInteger.ONE;
         when(amenityRepository.existsById(amenityId)).thenReturn(true);
 
@@ -106,7 +106,7 @@ public class AmenityServiceTest {
     }
 
     @Test
-    public void AmenityService_DeleteAmenity_ThrowsException_WhenAmenityNotFound() {
+    public void AmenityService_Delete_ThrowsException_WhenAmenityNotFound() {
         when(amenityRepository.existsById(any())).thenReturn(false);
 
         assertThrows(AmenityNotFoundException.class, () -> amenityService.delete(BigInteger.ONE));

@@ -52,7 +52,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void UserService_CreateUser_CreatesUser() {
+    public void UserService_Create_CreatesUser() {
         when(passwordEncoder.encode(userDTO.password())).thenReturn("encodedPassword");
         when(userRepository.saveAndFlush(any(User.class))).thenReturn(user);
 
@@ -92,7 +92,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void UserService_DeleteById_DeletesUser() {
+    public void UserService_Delete_DeletesUser() {
         when(userRepository.existsById(user.getId())).thenReturn(true);
         doNothing().when(userRepository).deleteById(user.getId());
 
@@ -101,7 +101,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void UserService_DeleteById_ThrowsException() {
+    void UserService_Delete_ThrowsException() {
         when(userRepository.existsById(user.getId())).thenReturn(false);
         assertThrows(UserNotFoundException.class, () -> userService.delete(user.getId()));
     }
