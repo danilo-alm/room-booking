@@ -97,7 +97,6 @@ public class RoomService {
         return room;
     }
 
-    @Transactional
     public void delete(BigInteger id) {
         if (!roomRepository.existsById(id)) {
             throw new RoomNotFoundException();
