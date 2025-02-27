@@ -56,7 +56,7 @@ public class RoomServiceTest {
     public void RoomService_CreateRoom_ReturnsCreatedRoom() {
         when(roomRepository.saveAndFlush(any(Room.class))).thenReturn(room);
 
-        Room response = roomService.createRoom(requestDTO);
+        Room response = roomService.create(requestDTO);
 
         assertNotNull(response);
         assertEquals("R101", response.getIdentifier());
@@ -70,7 +70,7 @@ public class RoomServiceTest {
     public void RoomService_GetRoom_ById_ReturnsRoom() {
         when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
 
-        Room response = roomService.getRoomById(roomId);
+        Room response = roomService.getById(roomId);
 
         assertNotNull(response);
         assertEquals("R101", response.getIdentifier());
@@ -84,7 +84,7 @@ public class RoomServiceTest {
         String identifier = room.getIdentifier();
         when(roomRepository.findByIdentifier(identifier)).thenReturn(Optional.of(room));
 
-        Room response = roomService.getRoomByIdentifier(identifier);
+        Room response = roomService.getByIdentifier(identifier);
 
         assertNotNull(response);
         assertEquals("R101", response.getIdentifier());
@@ -103,7 +103,7 @@ public class RoomServiceTest {
         when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
         when(amenityRepository.findByIdIn(anyCollection())).thenReturn(List.of(amenity));
 
-        Room response = roomService.updateRoom(roomId, requestDTO);
+        Room response = roomService.update(roomId, requestDTO);
 
         assertNotNull(response);
         assertEquals("R101", response.getIdentifier());
@@ -117,7 +117,7 @@ public class RoomServiceTest {
     public void RoomService_UpdateRoom_ThrowsException_WhenRoomNotFound() {
         when(roomRepository.findById(roomId)).thenReturn(Optional.empty());
 
-        assertThrows(RoomNotFoundException.class, () -> roomService.updateRoom(roomId, requestDTO));
+        assertThrows(RoomNotFoundException.class, () -> roomService.update(roomId, requestDTO));
 
         verify(roomRepository).findById(roomId);
     }
@@ -126,7 +126,7 @@ public class RoomServiceTest {
     public void RoomService_DeleteRoom_DeletesRoom() {
         when(roomRepository.existsById(roomId)).thenReturn(true);
 
-        roomService.deleteRoom(roomId);
+        roomService.delete(roomId);
 
         verify(roomRepository).deleteById(roomId);
     }
@@ -135,7 +135,7 @@ public class RoomServiceTest {
     public void RoomService_DeleteRoom_ThrowsException_WhenRoomNotFound() {
         when(roomRepository.existsById(roomId)).thenReturn(false);
 
-        assertThrows(RoomNotFoundException.class, () -> roomService.deleteRoom(roomId));
+        assertThrows(RoomNotFoundException.class, () -> roomService.delete(roomId));
 
         verify(roomRepository, never()).deleteById(roomId);
     }

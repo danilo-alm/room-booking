@@ -22,7 +22,7 @@ public class AmenityController {
 
     @PostMapping(ApiPaths.Amenity.CREATE)
     public ResponseEntity<AmenityResponseDTO> createAmenity(@RequestBody AmenityRequestDTO amenityRequestDTO) {
-        Amenity amenity = amenityService.createAmenity(amenityRequestDTO);
+        Amenity amenity = amenityService.create(amenityRequestDTO);
         return ResponseEntity.ok(new AmenityResponseDTO(amenity));
     }
 
@@ -33,16 +33,16 @@ public class AmenityController {
     ) {
         Page<Amenity> amenities;
         if (prefix != null) {
-            amenities = amenityService.getAmenitiesWithPrefix(prefix, pageable);
+            amenities = amenityService.getWithPrefix(prefix, pageable);
         } else {
-            amenities = amenityService.getAmenities(pageable);
+            amenities = amenityService.getAll(pageable);
         }
         return ResponseEntity.ok(amenities.map(AmenityResponseDTO::new));
     }
 
     @DeleteMapping(ApiPaths.Amenity.DELETE)
     public ResponseEntity<Void> deleteAmenity(@PathVariable BigInteger id) {
-        amenityService.deleteAmenity(id);
+        amenityService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

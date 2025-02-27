@@ -38,7 +38,7 @@ public class AmenityServiceTest {
 
         when(amenityRepository.save(any(Amenity.class))).thenReturn(amenity);
 
-        Amenity response = amenityService.createAmenity(requestDTO);
+        Amenity response = amenityService.create(requestDTO);
 
         assertNotNull(response);
         assertEquals("Projector", response.getName());
@@ -53,7 +53,7 @@ public class AmenityServiceTest {
 
         when(amenityRepository.findAll(Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(amenity)));
 
-        Page<Amenity> response = amenityService.getAmenities(Pageable.unpaged());
+        Page<Amenity> response = amenityService.getAll(Pageable.unpaged());
 
         assertNotNull(response);
         assertEquals(1, response.getTotalPages());
@@ -71,7 +71,7 @@ public class AmenityServiceTest {
         when(amenityRepository.findByNameStartingWithIgnoreCase("wh", Pageable.unpaged()))
             .thenReturn(new PageImpl<>(List.of(amenity)));
 
-        Page<Amenity> response = amenityService.getAmenitiesWithPrefix("wh", Pageable.unpaged());
+        Page<Amenity> response = amenityService.getWithPrefix("wh", Pageable.unpaged());
 
         assertNotNull(response);
         assertEquals(1, response.getTotalElements());
@@ -86,7 +86,7 @@ public class AmenityServiceTest {
         when(amenityRepository.findByNameStartingWithIgnoreCase("wh", Pageable.unpaged()))
             .thenReturn(Page.empty());
 
-        Page<Amenity> response = amenityService.getAmenitiesWithPrefix("wh", Pageable.unpaged());
+        Page<Amenity> response = amenityService.getWithPrefix("wh", Pageable.unpaged());
 
         assertNotNull(response);
         assertEquals(0, response.getTotalElements());
@@ -99,7 +99,7 @@ public class AmenityServiceTest {
         BigInteger amenityId = BigInteger.ONE;
         when(amenityRepository.existsById(amenityId)).thenReturn(true);
 
-        amenityService.deleteAmenity(amenityId);
+        amenityService.delete(amenityId);
 
         verify(amenityRepository).deleteById(amenityId);
         verify(amenityRepository).existsById(amenityId);
@@ -109,7 +109,7 @@ public class AmenityServiceTest {
     public void AmenityService_DeleteAmenity_ThrowsException_WhenAmenityNotFound() {
         when(amenityRepository.existsById(any())).thenReturn(false);
 
-        assertThrows(AmenityNotFoundException.class, () -> amenityService.deleteAmenity(BigInteger.ONE));
+        assertThrows(AmenityNotFoundException.class, () -> amenityService.delete(BigInteger.ONE));
 
         verify(amenityRepository, never()).deleteById(any());
     }
