@@ -84,4 +84,8 @@ public class RoomController {
         return ResponseEntity.ok(RoomType.getMap());
     }
 
+    @GetMapping(ApiPaths.Room.GET_STATUS)
+    public ResponseEntity<Map<String, String>> getRoomStatus() {
+        return ResponseEntity.ok(RoomStatus.getMap());
+    }
 }

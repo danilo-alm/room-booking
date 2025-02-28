@@ -1,10 +1,12 @@
 package com.danilo.roombooking.service.user;
 
+import com.danilo.roombooking.config.SecurityConstants;
 import com.danilo.roombooking.domain.User;
 import com.danilo.roombooking.domain.authority.Authority;
 import com.danilo.roombooking.dto.UserRequestDTO;
 import com.danilo.roombooking.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,8 @@ public class UserService {
 
     @Transactional
     public User create(UserRequestDTO userDTO) {
+        validateUserRequest(userDTO);
+
         String encryptedPassword = passwordEncoder.encode(userDTO.password());
 
         User user = User.builder()
@@ -56,6 +60,24 @@ public class UserService {
             throw new UserNotFoundException();
         }
         userRepository.deleteById(id);
+    }
+
+    private void validateUserRequest(UserRequestDTO userRequestDTO) {
+        if (userRequestDTO.username() == null || userRequestDTO.username().isBlank())
+            throw new InvalidUserException("username is required.");
+
+        if (userRequestDTO.password() == null || userRequestDTO.password().isBlank())
+            throw new InvalidUserException("password is required.");
+
+        if (userRequestDTO.password().length() < SecurityConstants.MIN_PASSWORD_LENGTH)
+            throw new InvalidUserException("password must be at least "
+                + SecurityConstants.MIN_PASSWORD_LENGTH + " characters.");
+
+        if (userRequestDTO.fullName() == null || userRequestDTO.fullName().isBlank())
+            throw new InvalidUserException("fullName is required.");
+
+        if (userRequestDTO.email() == null || userRequestDTO.email().isBlank())
+            throw new InvalidUserException("email is required.");
     }
 
 }

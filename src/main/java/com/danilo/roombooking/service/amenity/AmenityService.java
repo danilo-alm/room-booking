@@ -15,8 +15,11 @@ public class AmenityService {
     private final AmenityRepository amenityRepository;
 
     public Amenity create(AmenityRequestDTO amenityRequestDTO) {
+        validateAmenityRequest(amenityRequestDTO);
+
         Amenity amenity = new Amenity();
         amenity.setName(amenityRequestDTO.name());
+
         return amenityRepository.save(amenity);
     }
 
@@ -33,6 +36,11 @@ public class AmenityService {
             throw new AmenityNotFoundException();
         }
         amenityRepository.deleteById(id);
+    }
+
+    private void validateAmenityRequest(AmenityRequestDTO amenity) {
+        if (amenity.name() == null || amenity.name().isBlank())
+            throw new InvalidAmenityException("name is required.");
     }
 
 }

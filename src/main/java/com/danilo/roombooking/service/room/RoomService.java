@@ -1,5 +1,6 @@
 package com.danilo.roombooking.service.room;
 
+import com.danilo.roombooking.config.ApiPaths;
 import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room_amenity.RoomAmenity;
 import com.danilo.roombooking.dto.RoomFilterDTO;
@@ -27,6 +28,8 @@ public class RoomService {
 
     @Transactional
     public Room create(RoomRequestDTO roomRequestDTO) {
+        validateRoomRequest(roomRequestDTO);
+
         Room room = Room.builder()
             .identifier(roomRequestDTO.identifier())
             .name(roomRequestDTO.name())
@@ -107,6 +110,29 @@ public class RoomService {
     private Set<RoomAmenity> getRoomAmenitySet(Room room, Collection<Long> amenitiesIds) {
         return amenityRepository.findByIdIn(amenitiesIds).stream().map(amenity ->
             new RoomAmenity(room, amenity)).collect(Collectors.toSet());
+    }
+
+    private void validateRoomRequest(RoomRequestDTO roomRequestDTO) {
+        if (roomRequestDTO.identifier() == null || roomRequestDTO.identifier().isBlank())
+            throw new InvalidRoomException("identifier is required.");
+
+        if (roomRequestDTO.name() == null || roomRequestDTO.name().isBlank())
+            throw new InvalidRoomException("name is required.");
+
+        if (roomRequestDTO.capacity() == null || roomRequestDTO.capacity() < 1)
+            throw new InvalidRoomException("capacity is required and should be greater than zero.");
+
+        if (roomRequestDTO.status() == null) {
+            String getStatusesEndpoint = ApiPaths.Room.ROOT + ApiPaths.Room.GET_STATUS;
+            throw new InvalidRoomException("status is required. Send a GET request to '"
+                + getStatusesEndpoint + "' to see available statuses.");
+        }
+
+        if (roomRequestDTO.type() == null) {
+            String getTypesEndpoint = ApiPaths.Room.ROOT + ApiPaths.Room.GET_TYPES;
+            throw new InvalidRoomException("type is required. Send a GET request to '"
+                + getTypesEndpoint + "' to see available types.");
+        }
     }
 
 }

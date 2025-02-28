@@ -33,9 +33,8 @@ public class BookingService {
         checkRoomAvailabilityInTimeInterval(bookingRequestDTO);
 
         Room room = roomService.getById(bookingRequestDTO.roomId());
-        if (room.getStatus() != RoomStatus.AVAILABLE) {
+        if (room.getStatus() != RoomStatus.AVAILABLE)
             throw new UnavailableRoomException("Room is not available.");
-        }
 
         User user = userService.getById(bookingRequestDTO.userId());
 
