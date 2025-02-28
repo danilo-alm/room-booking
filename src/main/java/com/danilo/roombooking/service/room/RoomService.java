@@ -72,27 +72,26 @@ public class RoomService {
     public Room update(Long roomId, RoomRequestDTO roomRequestDTO) {
         Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
 
-        if (roomRequestDTO.identifier() != null) {
+        if (roomRequestDTO.identifier() != null)
             room.setIdentifier(roomRequestDTO.identifier());
-        }
-        if (roomRequestDTO.name() != null) {
+
+        if (roomRequestDTO.name() != null)
             room.setName(roomRequestDTO.name());
-        }
-        if (roomRequestDTO.description() != null) {
+
+        if (roomRequestDTO.description() != null)
             room.setDescription(roomRequestDTO.description());
-        }
-        if (roomRequestDTO.capacity() != null) {
+
+        if (roomRequestDTO.capacity() != null)
             room.setCapacity(roomRequestDTO.capacity());
-        }
-        if (roomRequestDTO.status() != null) {
+
+        if (roomRequestDTO.status() != null)
             room.setStatus(roomRequestDTO.status());
-        }
-        if (roomRequestDTO.type() != null) {
+
+        if (roomRequestDTO.type() != null)
             room.setType(roomRequestDTO.type());
-        }
-        if (roomRequestDTO.amenitiesIds() != null) {
+
+        if (roomRequestDTO.amenitiesIds() != null)
             room.setAmenities(getRoomAmenitySet(room, roomRequestDTO.amenitiesIds()));
-        }
 
         return room;
     }
