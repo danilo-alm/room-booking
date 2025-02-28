@@ -78,7 +78,7 @@ public class BookingService {
 
     @Transactional
     public Booking update(Long bookingId, BookingRequestDTO bookingRequestDTO) {
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(BookingNotFoundException::new);
+        Booking booking = getById(bookingId);
 
         Timestamp startTime = bookingRequestDTO.startTime();
         Timestamp endTime = bookingRequestDTO.endTime();
