@@ -14,6 +14,4 @@ CREATE TABLE Users
     FailedLoginAttempts INT          NOT NULL DEFAULT 0
 );
 
-CREATE UNIQUE INDEX UX_Users_Email ON Users (Email);
-CREATE UNIQUE INDEX UX_Users_Username ON Users (Username);
 CREATE SEQUENCE user_sequence AS BIGINT INCREMENT BY 1 START WITH 1;
