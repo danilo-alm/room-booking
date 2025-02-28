@@ -7,7 +7,6 @@ import com.danilo.roombooking.domain.room_amenity.RoomAmenity;
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 public class RoomSpecification {
@@ -37,7 +36,7 @@ public class RoomSpecification {
             type == null ? null : builder.equal(root.get("type"), type);
     }
 
-    public static Specification<Room> hasAmenities(Set<BigInteger> amenityIds) {
+    public static Specification<Room> hasAmenities(Set<Long> amenityIds) {
         return (root, query, builder) -> {
             if (amenityIds == null || amenityIds.isEmpty()) {
                 return null;

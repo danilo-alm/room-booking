@@ -15,7 +15,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigInteger;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,7 +37,7 @@ public class RoomController {
     }
 
     @GetMapping(ApiPaths.Room.GET_BY_ID)
-    public ResponseEntity<RoomResponseDTO> getRoomById(@PathVariable BigInteger id) {
+    public ResponseEntity<RoomResponseDTO> getRoomById(@PathVariable Long id) {
         Room room = roomService.getById(id);
         return ResponseEntity.ok(new RoomResponseDTO(room));
     }
@@ -56,7 +55,7 @@ public class RoomController {
         @RequestParam(required = false) Integer maxCapacity,
         @RequestParam(required = false) RoomStatus status,
         @RequestParam(required = false) RoomType type,
-        @RequestParam(required = false) Set<BigInteger> amenityIds,
+        @RequestParam(required = false) Set<Long> amenityIds,
         @PageableDefault Pageable pageable
     ) {
         RoomFilterDTO roomFilterDTO = new RoomFilterDTO(name, minCapacity, maxCapacity, status, type, amenityIds);
@@ -66,7 +65,7 @@ public class RoomController {
 
     @PutMapping(ApiPaths.Room.UPDATE)
     public ResponseEntity<RoomResponseDTO> updateRoom(
-        @PathVariable("id") BigInteger id,
+        @PathVariable("id") Long id,
         @RequestBody RoomRequestDTO roomRequestDTO
     ) {
         Room updatedRoom = roomService.update(id, roomRequestDTO);
@@ -74,7 +73,7 @@ public class RoomController {
     }
 
     @DeleteMapping(ApiPaths.Room.DELETE)
-    public ResponseEntity<Void> deleteRoom(@PathVariable BigInteger id) {
+    public ResponseEntity<Void> deleteRoom(@PathVariable Long id) {
         roomService.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -14,7 +14,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,7 +46,7 @@ public class RoomService {
         return roomRepository.findAll(pageable);
     }
 
-    public Room getById(BigInteger id) {
+    public Room getById(Long id) {
         return roomRepository.findById(id).orElseThrow(RoomNotFoundException::new);
     }
 
@@ -69,7 +68,7 @@ public class RoomService {
     }
 
     @Transactional
-    public Room update(BigInteger roomId, RoomRequestDTO roomRequestDTO) {
+    public Room update(Long roomId, RoomRequestDTO roomRequestDTO) {
         Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
 
         if (roomRequestDTO.identifier() != null) {
@@ -97,14 +96,15 @@ public class RoomService {
         return room;
     }
 
-    public void delete(BigInteger id) {
+    @Transactional
+    public void delete(Long id) {
         if (!roomRepository.existsById(id)) {
             throw new RoomNotFoundException();
         }
         roomRepository.deleteById(id);
     }
 
-    private Set<RoomAmenity> getRoomAmenitySet(Room room, Collection<BigInteger> amenitiesIds) {
+    private Set<RoomAmenity> getRoomAmenitySet(Room room, Collection<Long> amenitiesIds) {
         return amenityRepository.findByIdIn(amenitiesIds).stream().map(amenity ->
             new RoomAmenity(room, amenity)).collect(Collectors.toSet());
     }

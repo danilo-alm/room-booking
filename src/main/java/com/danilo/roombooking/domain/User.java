@@ -7,7 +7,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Set;
 
@@ -27,7 +26,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     @Column(name = "Id", columnDefinition = "BIGINT UNSIGNED")
-    private BigInteger id;
+    private Long id;
 
     @Column(name = "Username", columnDefinition = "VARCHAR(36) NOT NULL UNIQUE")
     private String username;

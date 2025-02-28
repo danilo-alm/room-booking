@@ -4,7 +4,6 @@ import jakarta.persistence.Embeddable;
 import lombok.*;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 @Embeddable
 @Getter
@@ -13,7 +12,7 @@ import java.math.BigInteger;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class AuthorityId implements Serializable {
-    private BigInteger user;
+    private Long user;
     private String authority;
 }
 

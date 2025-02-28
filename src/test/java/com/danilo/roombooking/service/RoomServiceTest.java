@@ -16,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -38,17 +37,17 @@ public class RoomServiceTest {
     @InjectMocks
     private RoomService roomService;
 
-    BigInteger roomId;
+    Long roomId;
     Room room;
     RoomRequestDTO requestDTO;
 
     @BeforeEach
     void setUp() {
-        roomId = BigInteger.ONE;
+        roomId = 1L;
 
         requestDTO = createRoomRequestDTO("R101", "Classroom 101", 50);
 
-        room = createRoom(BigInteger.ONE, "R101", "Classroom 101", 50);
+        room = createRoom(1L, "R101", "Classroom 101", 50);
         room.setType(RoomType.SCIENCE_LAB);
     }
 
@@ -98,7 +97,7 @@ public class RoomServiceTest {
         requestDTO = createRoomRequestDTO("R101", "Updated Classroom", 60);
 
         Amenity amenity = new Amenity();
-        amenity.setId(BigInteger.ONE);
+        amenity.setId(1L);
 
         when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
         when(amenityRepository.findByIdIn(anyCollection())).thenReturn(List.of(amenity));
@@ -140,7 +139,7 @@ public class RoomServiceTest {
         verify(roomRepository, never()).deleteById(roomId);
     }
 
-    private Room createRoom(BigInteger roomId, String identifier, String name, int capacity) {
+    private Room createRoom(Long roomId, String identifier, String name, int capacity) {
         Room room = new Room();
         room.setId(roomId);
         room.setIdentifier(identifier);
@@ -155,6 +154,6 @@ public class RoomServiceTest {
 
     private RoomRequestDTO createRoomRequestDTO(String identifier, String name, int capacity) {
         return new RoomRequestDTO(identifier, name, "A large classroom", capacity,
-            RoomStatus.AVAILABLE, RoomType.STANDARD_CLASSROOM, List.of(BigInteger.ONE));
+            RoomStatus.AVAILABLE, RoomType.STANDARD_CLASSROOM, List.of(1L));
     }
 }

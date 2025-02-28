@@ -12,8 +12,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigInteger;
-
 @RestController
 @RequestMapping(ApiPaths.Amenity.ROOT)
 @RequiredArgsConstructor
@@ -41,7 +39,7 @@ public class AmenityController {
     }
 
     @DeleteMapping(ApiPaths.Amenity.DELETE)
-    public ResponseEntity<Void> deleteAmenity(@PathVariable BigInteger id) {
+    public ResponseEntity<Void> deleteAmenity(@PathVariable Long id) {
         amenityService.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,7 +37,7 @@ public class UserService {
         return userRepository.saveAndFlush(user);
     }
 
-    public User getById(BigInteger id) {
+    public User getById(Long id) {
         return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
     }
 
@@ -51,7 +50,7 @@ public class UserService {
     }
 
     @Transactional
-    public void delete(BigInteger id) {
+    public void delete(Long id) {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException();
         }
