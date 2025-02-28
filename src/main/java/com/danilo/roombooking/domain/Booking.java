@@ -2,13 +2,9 @@ package com.danilo.roombooking.domain;
 
 import com.danilo.roombooking.domain.room.Room;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
 
 @Entity
@@ -20,6 +16,7 @@ import java.sql.Timestamp;
     }
 )
 @Data
+@Builder
 @EqualsAndHashCode
 @DynamicInsert
 @NoArgsConstructor
@@ -29,7 +26,7 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "amenity_seq")
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
-    private BigInteger id;
+    private Long id;
 
     @JoinColumn(name = "roomId", columnDefinition = "BIGINT UNSIGNED")
     @ManyToOne(fetch = FetchType.LAZY)
