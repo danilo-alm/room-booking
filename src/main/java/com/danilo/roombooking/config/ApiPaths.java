@@ -30,4 +30,16 @@ public final class ApiPaths {
         public static final String GET = "";
         public static final String DELETE = "/{id}";
     }
+
+    public static final class Booking {
+        public static final String ROOT = BASE_API + "/booking";
+        public static final String CREATE = "";
+        public static final String GET = "";
+        public static final String GET_BY_ID = "/id/{id}";
+        public static final String GET_BY_USERID = "/user/{userId}";
+        public static final String GET_BY_ROOMID = "/room/{roomId}";
+        public static final String GET_FILTER = "/filter";
+        public static final String UPDATE = "/{id}";
+        public static final String DELETE = "/{id}";
+    }
 }
