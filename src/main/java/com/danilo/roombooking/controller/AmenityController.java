@@ -19,13 +19,13 @@ public class AmenityController {
     private final AmenityService amenityService;
 
     @PostMapping(ApiPaths.Amenity.CREATE)
-    public ResponseEntity<AmenityResponseDTO> createAmenity(@RequestBody AmenityRequestDTO amenityRequestDTO) {
+    public ResponseEntity<AmenityResponseDTO> create(@RequestBody AmenityRequestDTO amenityRequestDTO) {
         Amenity amenity = amenityService.create(amenityRequestDTO);
         return ResponseEntity.ok(new AmenityResponseDTO(amenity));
     }
 
     @GetMapping(ApiPaths.Amenity.GET)
-    public ResponseEntity<Page<AmenityResponseDTO>> getAmenities(
+    public ResponseEntity<Page<AmenityResponseDTO>> getAllOrWithPrefix(
         @RequestParam(required = false) String prefix,
         @PageableDefault Pageable pageable
     ) {
@@ -39,7 +39,7 @@ public class AmenityController {
     }
 
     @DeleteMapping(ApiPaths.Amenity.DELETE)
-    public ResponseEntity<Void> deleteAmenity(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         amenityService.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -25,31 +25,31 @@ public class RoomController {
     private final RoomService roomService;
 
     @PostMapping(ApiPaths.Room.CREATE)
-    public ResponseEntity<RoomResponseDTO> createRoom(@RequestBody RoomRequestDTO roomRequestDTO) {
+    public ResponseEntity<RoomResponseDTO> create(@RequestBody RoomRequestDTO roomRequestDTO) {
         Room room = roomService.create(roomRequestDTO);
         return ResponseEntity.ok(new RoomResponseDTO(room));
     }
 
     @GetMapping(ApiPaths.Room.GET)
-    public ResponseEntity<Page<RoomResponseDTO>> getRooms(@PageableDefault Pageable pageable) {
+    public ResponseEntity<Page<RoomResponseDTO>> getAll(@PageableDefault Pageable pageable) {
         Page<Room> rooms = roomService.getAll(pageable);
         return ResponseEntity.ok(rooms.map(RoomResponseDTO::new));
     }
 
     @GetMapping(ApiPaths.Room.GET_BY_ID)
-    public ResponseEntity<RoomResponseDTO> getRoomById(@PathVariable Long id) {
+    public ResponseEntity<RoomResponseDTO> getById(@PathVariable Long id) {
         Room room = roomService.getById(id);
         return ResponseEntity.ok(new RoomResponseDTO(room));
     }
 
     @GetMapping(ApiPaths.Room.GET_BY_IDENTIFIER)
-    public ResponseEntity<RoomResponseDTO> getRoomByIdentifier(@PathVariable String identifier) {
+    public ResponseEntity<RoomResponseDTO> getByIdentifier(@PathVariable String identifier) {
         Room room = roomService.getByIdentifier(identifier);
         return ResponseEntity.ok(new RoomResponseDTO(room));
     }
 
     @GetMapping(ApiPaths.Room.GET_FILTER)
-    public ResponseEntity<Page<RoomResponseDTO>> filterRooms(
+    public ResponseEntity<Page<RoomResponseDTO>> getFilter(
         @RequestParam(required = false) String name,
         @RequestParam(required = false) Integer minCapacity,
         @RequestParam(required = false) Integer maxCapacity,
@@ -64,7 +64,7 @@ public class RoomController {
     }
 
     @PutMapping(ApiPaths.Room.UPDATE)
-    public ResponseEntity<RoomResponseDTO> updateRoom(
+    public ResponseEntity<RoomResponseDTO> update(
         @PathVariable("id") Long id,
         @RequestBody RoomRequestDTO roomRequestDTO
     ) {
@@ -73,7 +73,7 @@ public class RoomController {
     }
 
     @DeleteMapping(ApiPaths.Room.DELETE)
-    public ResponseEntity<Void> deleteRoom(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         roomService.delete(id);
         return ResponseEntity.noContent().build();
     }
