@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(ApiPaths.Amenity.ROOT)
 @RequiredArgsConstructor
 public class AmenityController {
+
     private final AmenityService amenityService;
 
     @PostMapping(ApiPaths.Amenity.CREATE)
@@ -30,11 +31,11 @@ public class AmenityController {
         @PageableDefault Pageable pageable
     ) {
         Page<Amenity> amenities;
-        if (prefix != null) {
+        if (prefix != null)
             amenities = amenityService.getWithPrefix(prefix, pageable);
-        } else {
+        else
             amenities = amenityService.getAll(pageable);
-        }
+
         return ResponseEntity.ok(amenities.map(AmenityResponseDTO::new));
     }
 
@@ -43,4 +44,5 @@ public class AmenityController {
         amenityService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 }

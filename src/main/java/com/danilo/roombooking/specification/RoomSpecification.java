@@ -52,4 +52,5 @@ public class RoomSpecification {
             return roomAmenities.get("amenity").get("id").in(amenityIds);
         };
     }
+
 }

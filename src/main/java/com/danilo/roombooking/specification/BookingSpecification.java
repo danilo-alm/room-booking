@@ -26,4 +26,5 @@ public class BookingSpecification {
         return ((root, query, builder) ->
             maxEndTime == null ? null : builder.lessThanOrEqualTo(root.get("endTime"), maxEndTime));
     }
+
 }

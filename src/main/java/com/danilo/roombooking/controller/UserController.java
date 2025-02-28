@@ -16,6 +16,7 @@ import java.net.URI;
 @RequestMapping(ApiPaths.User.ROOT)
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
 
     @PostMapping(ApiPaths.User.CREATE)
@@ -34,15 +35,15 @@ public class UserController {
         @RequestParam(required = false) String email
     ) {
         User user;
-        if (id != null) {
+        if (id != null)
             user = userService.getById(id);
-        } else if (username != null) {
+        else if (username != null)
             user = userService.getByUsername(username);
-        } else if (email != null) {
+        else if (email != null)
             user = userService.getByEmail(email);
-        } else {
+        else
             return ResponseEntity.badRequest().build();
-        }
+
         return ResponseEntity.ok(new UserResponseDTO(user));
     }
 
@@ -51,4 +52,5 @@ public class UserController {
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 }

@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class RoomService {
+
     private final RoomRepository roomRepository;
     private final AmenityRepository amenityRepository;
 
@@ -108,4 +109,5 @@ public class RoomService {
         return amenityRepository.findByIdIn(amenitiesIds).stream().map(amenity ->
             new RoomAmenity(room, amenity)).collect(Collectors.toSet());
     }
+
 }

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -56,4 +57,5 @@ public class UserService {
         }
         userRepository.deleteById(id);
     }
+
 }

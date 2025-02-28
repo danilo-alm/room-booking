@@ -22,6 +22,7 @@ import java.util.Set;
 @RequestMapping(ApiPaths.Room.ROOT)
 @RequiredArgsConstructor
 public class RoomController {
+
     private final RoomService roomService;
 
     @PostMapping(ApiPaths.Room.CREATE)
@@ -82,4 +83,5 @@ public class RoomController {
     public ResponseEntity<Map<String, String>> getRoomTypes() {
         return ResponseEntity.ok(RoomType.getMap());
     }
+
 }

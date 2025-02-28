@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AmenityService {
+
     private final AmenityRepository amenityRepository;
 
     public Amenity create(AmenityRequestDTO amenityRequestDTO) {
