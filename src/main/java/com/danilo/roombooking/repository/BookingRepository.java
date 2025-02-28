@@ -27,8 +27,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpec
     @Query("""
     SELECT COUNT(b) > 0 FROM Booking b
     WHERE b.room.id = :roomId
-    AND ((b.startTime BETWEEN :startTime AND :endTime)
-        OR (b.endTime BETWEEN :startTime AND :endTime))
+    AND b.startTime < :endTime
+    AND b.endTime > :startTime
     AND b.id != :bookingId
     """)
     boolean isRoomBookedDuringTimeRangeExcludingCurrentBooking(@Param("roomId") Long roomId,
