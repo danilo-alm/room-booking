@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -42,7 +41,7 @@ public class AmenityRepositoryTest extends AbstractRepositoryTest {
 
     @Test
     public void AmenityRepository_FindByIdIn_ReturnsEmptyList_WhenNoMatch() {
-        List<Amenity> amenities = amenityRepository.findByIdIn(Set.of(BigInteger.valueOf(999)));
+        List<Amenity> amenities = amenityRepository.findByIdIn(Set.of(999L));
 
         assertTrue(amenities.isEmpty());
     }

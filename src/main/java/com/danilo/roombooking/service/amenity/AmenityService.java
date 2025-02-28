@@ -8,8 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
-
 @Service
 @RequiredArgsConstructor
 public class AmenityService {
@@ -29,7 +27,7 @@ public class AmenityService {
         return amenityRepository.findByNameStartingWithIgnoreCase(prefix, pageable);
     }
 
-    public void delete(BigInteger id) {
+    public void delete(Long id) {
         if (!amenityRepository.existsById(id)) {
             throw new AmenityNotFoundException();
         }

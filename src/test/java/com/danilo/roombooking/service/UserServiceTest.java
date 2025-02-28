@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -41,7 +40,7 @@ public class UserServiceTest {
     public void setUp() {
         userDTO = new UserRequestDTO("testUser", "password", "Test User", true, "test@example.com", Set.of("ROLE_USER"));
         user = User.builder()
-            .id(BigInteger.ONE)
+            .id(1L)
             .username(userDTO.username())
             .password("encodedPassword")
             .fullName(userDTO.fullName())

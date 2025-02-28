@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 @Entity
@@ -23,7 +22,7 @@ public class Amenity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "amenity_seq")
     @Column(name = "Id", columnDefinition = "BIGINT UNSIGNED")
-    private BigInteger id;
+    private Long id;
 
     @Column(name = "Name", columnDefinition = "VARCHAR(50) NOT NULL UNIQUE")
     private String name;

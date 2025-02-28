@@ -5,12 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoomAmenityId implements Serializable {
-    private BigInteger room;
-    private BigInteger amenity;
+    private Long room;
+    private Long amenity;
 }

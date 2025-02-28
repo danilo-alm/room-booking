@@ -7,7 +7,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Set;
 
@@ -26,7 +25,7 @@ public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "room_seq")
     @Column(name = "Id", columnDefinition = "BIGINT UNSIGNED")
-    private BigInteger id;
+    private Long id;
 
     @Column(name = "Identifier", columnDefinition = "VARCHAR(50) NOT NULL UNIQUE")
     private String identifier;

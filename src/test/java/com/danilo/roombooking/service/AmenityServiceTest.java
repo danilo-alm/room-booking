@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -96,7 +95,7 @@ public class AmenityServiceTest {
 
     @Test
     public void AmenityService_Delete_DeletesAmenity() {
-        BigInteger amenityId = BigInteger.ONE;
+        Long amenityId = 1L;
         when(amenityRepository.existsById(amenityId)).thenReturn(true);
 
         amenityService.delete(amenityId);
@@ -109,7 +108,7 @@ public class AmenityServiceTest {
     public void AmenityService_Delete_ThrowsException_WhenAmenityNotFound() {
         when(amenityRepository.existsById(any())).thenReturn(false);
 
-        assertThrows(AmenityNotFoundException.class, () -> amenityService.delete(BigInteger.ONE));
+        assertThrows(AmenityNotFoundException.class, () -> amenityService.delete(1L));
 
         verify(amenityRepository, never()).deleteById(any());
     }

@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.math.BigInteger;
 import java.net.URI;
 
 @RestController
@@ -30,7 +29,7 @@ public class UserController {
 
     @GetMapping(ApiPaths.User.GET)
     public ResponseEntity<UserResponseDTO> getUser(
-        @RequestParam(required = false) BigInteger id,
+        @RequestParam(required = false) Long id,
         @RequestParam(required = false) String username,
         @RequestParam(required = false) String email
     ) {
@@ -48,7 +47,7 @@ public class UserController {
     }
 
     @DeleteMapping(ApiPaths.User.DELETE)
-    public ResponseEntity<Void> deleteUser(@PathVariable("id") BigInteger id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }
