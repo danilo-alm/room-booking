@@ -6,10 +6,7 @@ import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room.RoomStatus;
 import com.danilo.roombooking.dto.BookingRequestDTO;
 import com.danilo.roombooking.repository.BookingRepository;
-import com.danilo.roombooking.service.booking.BookingNotFoundException;
-import com.danilo.roombooking.service.booking.BookingService;
-import com.danilo.roombooking.service.booking.InvalidBookingException;
-import com.danilo.roombooking.service.booking.UnavailableRoomException;
+import com.danilo.roombooking.service.booking.*;
 import com.danilo.roombooking.service.room.RoomService;
 import com.danilo.roombooking.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,7 +60,7 @@ public class BookingServiceTest {
         user = new User();
 
         bookingRequestDTO = new BookingRequestDTO(1L, 1L, now, plusOneHour);
-        booking = new Booking(1L, null, null, now, plusOneHour, null, null);
+        booking = new Booking(1L, room, user, now, plusOneHour, null, null);
     }
 
     @Test
@@ -187,6 +184,36 @@ public class BookingServiceTest {
         assertNotNull(response);
         assertEquals(List.of(booking), response.getContent());
         verify(bookingRepository).findByRoomId(room.getId(), Pageable.unpaged());
+    }
+
+    @Test
+    public void BookingService_Update_UpdatesBooking_WhenValid() {
+        when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
+        when(bookingRepository.isRoomBookedDuringTimeRangeExcludingCurrentBooking(any(), any(), any(), any())).thenReturn(false);
+
+        BookingRequestDTO updateRequest = new BookingRequestDTO(booking.getRoom().getId(), booking.getUser().getId(), new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis() + 3600000));
+
+        Booking response = bookingService.update(booking.getId(), updateRequest);
+
+        assertNotNull(response);
+        assertEquals(updateRequest.startTime(), response.getStartTime());
+        assertEquals(updateRequest.endTime(), response.getEndTime());
+        verify(bookingRepository).findById(booking.getId());
+    }
+
+    @Test
+    public void BookingService_Update_ThrowsException_WhenBookingNotFound() {
+        when(bookingRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(BookingNotFoundException.class, () -> bookingService.update(1L, bookingRequestDTO));
+    }
+
+    @Test
+    public void BookingService_Update_ThrowsException_WhenRoomUnavailableInTimeInterval() {
+        when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
+        when(bookingRepository.isRoomBookedDuringTimeRangeExcludingCurrentBooking(any(), any(), any(), any())).thenReturn(true);
+
+        assertThrows(BookingConflictException.class, () -> bookingService.update(booking.getId(), bookingRequestDTO));
     }
 
     @Test
