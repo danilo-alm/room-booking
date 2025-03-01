@@ -122,10 +122,10 @@ public class BookingService {
     }
 
     private void checkRoomAvailabilityInTimeInterval(BookingRequestDTO bookingRequestDTO) {
-        boolean isAvailable = bookingRepository.isRoomBookedDuringTimeRange(
+        boolean isUnavailable = bookingRepository.isRoomBookedDuringTimeRange(
             bookingRequestDTO.roomId(), bookingRequestDTO.startTime(), bookingRequestDTO.endTime());
 
-        if (!isAvailable) throw new BookingConflictException();
+        if (isUnavailable) throw new BookingConflictException();
     }
 
     private void checkRoomUpdateAvailabilityInTimeInterval(Long bookingId, BookingRequestDTO bookingRequestDTO) {
