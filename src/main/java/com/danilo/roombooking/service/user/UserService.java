@@ -6,7 +6,6 @@ import com.danilo.roombooking.domain.authority.Authority;
 import com.danilo.roombooking.dto.UserRequestDTO;
 import com.danilo.roombooking.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
