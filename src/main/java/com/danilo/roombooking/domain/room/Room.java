@@ -37,7 +37,7 @@ public class Room {
     @Column(name = "Description", columnDefinition = "VARCHAR(100)")
     private String description;
 
-    @Column(name = "Capacity", columnDefinition = "INT NOT NULL")
+    @Column(name = "Capacity", columnDefinition = "INT NOT NULL CHECK (Capacity > 0)")
     private Integer capacity;
 
     @Column(name = "Status", columnDefinition = "VARCHAR(50) NOT NULL")
