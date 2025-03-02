@@ -1,0 +1,10 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        format_sql: ${HIBERNATE_FORMAT_SQL:true}
+    show-sql: ${JPA_SHOW_SQL:true}
+
+logging:
+  level:
+    root: ${SPRING_LOG_LEVEL:TRACE}

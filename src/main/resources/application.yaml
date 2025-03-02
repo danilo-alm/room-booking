@@ -10,11 +10,6 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       ddl-auto: validate
-    properties:
-      hibernate:
-        format_sql: ${HIBERNATE_FORMAT_SQL:true}
-    show-sql: ${JPA_SHOW_SQL:true}
 
-logging:
-  level:
-    root: ${SPRING_LOG_LEVEL:WARN}
+server:
+  port: 8080
