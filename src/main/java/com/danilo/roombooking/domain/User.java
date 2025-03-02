@@ -60,6 +60,6 @@ public class User {
     @Column(name = "FailedLoginAttempts", columnDefinition = "INT NOT NULL DEFAULT 0")
     private Integer failedLoginAttempts;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<Authority> authorities;
 }
