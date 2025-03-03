@@ -1,12 +1,12 @@
 package com.danilo.roombooking.service.room;
 
 import com.danilo.roombooking.config.ApiPaths;
+import com.danilo.roombooking.domain.Amenity;
 import com.danilo.roombooking.domain.room.Room;
-import com.danilo.roombooking.domain.room_amenity.RoomAmenity;
 import com.danilo.roombooking.dto.RoomFilterDTO;
 import com.danilo.roombooking.dto.RoomRequestDTO;
-import com.danilo.roombooking.repository.AmenityRepository;
 import com.danilo.roombooking.repository.RoomRepository;
+import com.danilo.roombooking.service.amenity.AmenityService;
 import com.danilo.roombooking.specification.RoomSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,16 +15,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class RoomService {
 
     private final RoomRepository roomRepository;
-    private final AmenityRepository amenityRepository;
+    private final AmenityService amenityService;
 
     @Transactional
     public Room create(RoomRequestDTO roomRequestDTO) {
@@ -39,9 +38,8 @@ public class RoomService {
             .status(roomRequestDTO.status())
             .build();
 
-        room.setAmenities(
-            getRoomAmenitySet(room, roomRequestDTO.amenitiesIds())
-        );
+        List<Amenity> amenities = amenityService.getByIdIn(roomRequestDTO.amenitiesIds());
+        room.setAmenities(new HashSet<>(amenities));
 
         return roomRepository.saveAndFlush(room);
     }
@@ -93,8 +91,10 @@ public class RoomService {
         if (roomRequestDTO.type() != null)
             room.setType(roomRequestDTO.type());
 
-        if (roomRequestDTO.amenitiesIds() != null)
-            room.setAmenities(getRoomAmenitySet(room, roomRequestDTO.amenitiesIds()));
+        if (roomRequestDTO.amenitiesIds() != null) {
+            List<Amenity> amenities = amenityService.getByIdIn(roomRequestDTO.amenitiesIds());
+            room.setAmenities(new HashSet<>(amenities));
+        }
 
         return room;
     }
@@ -105,11 +105,6 @@ public class RoomService {
             throw new RoomNotFoundException();
         }
         roomRepository.deleteById(id);
-    }
-
-    private Set<RoomAmenity> getRoomAmenitySet(Room room, Collection<Long> amenitiesIds) {
-        return amenityRepository.findByIdIn(amenitiesIds).stream().map(amenity ->
-            new RoomAmenity(room, amenity)).collect(Collectors.toSet());
     }
 
     private void validateRoomRequest(RoomRequestDTO roomRequestDTO) {

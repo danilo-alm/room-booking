@@ -1,10 +1,9 @@
 package com.danilo.roombooking.domain;
 
-import com.danilo.roombooking.domain.room_amenity.RoomAmenity;
+import com.danilo.roombooking.domain.room.Room;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
@@ -13,7 +12,6 @@ import java.util.Set;
 @Entity
 @Table
 @Data
-@EqualsAndHashCode(exclude = "roomAmenities")
 @DynamicInsert
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,6 +25,6 @@ public class Amenity {
     @Column(name = "Name", columnDefinition = "VARCHAR(50) NOT NULL UNIQUE")
     private String name;
 
-    @OneToMany(mappedBy = "amenity")
-    private Set<RoomAmenity> roomAmenities;
+    @ManyToMany(mappedBy = "amenities")
+    private Set<Room> rooms;
 }

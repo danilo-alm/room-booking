@@ -1,5 +1,6 @@
 package com.danilo.roombooking.dto;
 
+import com.danilo.roombooking.domain.Amenity;
 import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room.RoomStatus;
 import com.danilo.roombooking.domain.room.RoomType;
@@ -19,9 +20,7 @@ public record RoomResponseDTO(Long id, String identifier, String name, String de
             room.getCapacity(),
             room.getStatus(),
             room.getType(),
-            room.getAmenities().stream().map(
-                roomAmenity -> roomAmenity.getAmenity().getName()
-            ).collect(Collectors.toSet()),
+            room.getAmenities().stream().map(Amenity::getName).collect(Collectors.toSet()),
             room.getCreatedAt(),
             room.getUpdatedAt()
         );
