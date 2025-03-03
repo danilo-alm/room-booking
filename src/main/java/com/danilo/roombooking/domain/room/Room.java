@@ -1,9 +1,12 @@
 package com.danilo.roombooking.domain.room;
 
+import com.danilo.roombooking.domain.Amenity;
 import com.danilo.roombooking.domain.Booking;
-import com.danilo.roombooking.domain.room_amenity.RoomAmenity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -21,7 +24,6 @@ import java.util.Set;
 @NoArgsConstructor
 @DynamicInsert
 @Builder
-@EqualsAndHashCode(exclude = "amenities")
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "room_seq")
@@ -48,8 +50,13 @@ public class Room {
     @Enumerated(EnumType.STRING)
     private RoomType type;
 
-    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<RoomAmenity> amenities;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "Room_Amenity",
+        joinColumns = @JoinColumn(name = "RoomId"),
+        inverseJoinColumns = @JoinColumn(name = "AmenityId")
+    )
+    private Set<Amenity> amenities;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Booking> bookings;

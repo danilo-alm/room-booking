@@ -1,13 +1,13 @@
 package com.danilo.roombooking.specification;
 
+import com.danilo.roombooking.domain.Amenity;
 import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room.RoomStatus;
 import com.danilo.roombooking.domain.room.RoomType;
-import com.danilo.roombooking.domain.room_amenity.RoomAmenity;
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.Set;
+import java.util.Collection;
 
 public class RoomSpecification {
 
@@ -36,12 +36,12 @@ public class RoomSpecification {
             type == null ? null : builder.equal(root.get("type"), type);
     }
 
-    public static Specification<Room> hasAmenities(Set<Long> amenityIds) {
+    public static Specification<Room> hasAmenities(Collection<Long> amenityIds) {
         return (root, query, builder) -> {
-            if (amenityIds == null || amenityIds.isEmpty()) {
+            if (amenityIds == null || amenityIds.isEmpty())
                 return null;
-            }
-            Join<Room, RoomAmenity> roomAmenities = root.join("amenities");
+
+            Join<Room, Amenity> roomAmenities = root.join("amenities");
 
             if (query != null) {
                 query.groupBy(root.get("id"));
