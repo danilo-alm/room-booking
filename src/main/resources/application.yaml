@@ -13,3 +13,6 @@ spring:
 
 server:
   port: 8080
+
+default-admin-username: ${DEFAULT_ADMIN_USERNAME:admin}
+default-admin-password: ${DEFAULT_ADMIN_PASSWORD:admin}

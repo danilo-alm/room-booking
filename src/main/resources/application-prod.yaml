@@ -1,3 +1,6 @@
 logging:
   level:
     root: ${SPRING_LOG_LEVEL:ERROR}
+
+default-admin-username: ${DEFAULT_ADMIN_USERNAME}
+default-admin-password: ${DEFAULT_ADMIN_PASSWORD}
