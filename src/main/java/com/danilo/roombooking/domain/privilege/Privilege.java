@@ -25,6 +25,7 @@ public class Privilege {
 
     @Column(name = "Name", columnDefinition = "VARCHAR(50) NOT NULL UNIQUE")
     @Enumerated(EnumType.STRING)
+    @EqualsAndHashCode.Include
     private PrivilegeType name;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "privileges")

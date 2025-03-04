@@ -5,6 +5,7 @@ import com.danilo.roombooking.domain.privilege.PrivilegeType;
 import com.danilo.roombooking.repository.PrivilegeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -16,6 +17,7 @@ public class PrivilegeService {
 
     private final PrivilegeRepository privilegeRepository;
 
+    @Transactional
     public void populateDatabase() {
         Set<PrivilegeType> existingPrivileges = privilegeRepository.findAll().stream()
             .map(Privilege::getName)

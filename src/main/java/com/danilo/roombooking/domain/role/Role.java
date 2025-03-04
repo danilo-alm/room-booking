@@ -26,6 +26,7 @@ public class Role {
 
     @Column(name = "Name", columnDefinition = "VARCHAR(50) NOT NULL UNIQUE")
     @Enumerated(EnumType.STRING)
+    @EqualsAndHashCode.Include
     private RoleType name;
 
     @ManyToMany(mappedBy = "roles")
