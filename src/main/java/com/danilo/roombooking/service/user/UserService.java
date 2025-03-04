@@ -46,13 +46,11 @@ public class UserService {
             .enabled(userDTO.enabled())
             .build();
 
-        if (userDTO.roles() != null) {
-            Set<String> roleNames = userDTO.roles().stream()
-                .map(RoleType::name)
-                .collect(Collectors.toSet());
-            List<Role> roles = roleService.getByNameIn(userDTO.roles());
-            user.setRoles(new HashSet<>(roles));
-        }
+        user.setRoles(
+            userDTO.roles() == null
+            ? new HashSet<>() :
+            new HashSet<>(roleService.getByNameIn(userDTO.roles()))
+        );
 
         return userRepository.saveAndFlush(user);
     }
