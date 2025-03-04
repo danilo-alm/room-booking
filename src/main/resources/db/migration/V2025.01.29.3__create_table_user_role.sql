@@ -1,0 +1,8 @@
+CREATE TABLE User_Role
+(
+    UserId  BIGINT UNSIGNED,
+    RoleId  BIGINT UNSIGNED,
+    PRIMARY KEY (UserId, RoleId),
+    CONSTRAINT FK_UserRole_Users FOREIGN KEY (UserId) REFERENCES Users(Id),
+    CONSTRAINT FK_UserRole_Role FOREIGN KEY (RoleId) REFERENCES Role(Id)
+);
