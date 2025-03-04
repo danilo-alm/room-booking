@@ -15,17 +15,18 @@ import java.util.Set;
     @Index(name = "UX_Users_Email", columnList = "Email"),
     @Index(name = "UX_Users_Username", columnList = "Username"),
 })
-@SequenceGenerator(name = "user_seq", sequenceName = "user_sequence", allocationSize = 1)
-@EqualsAndHashCode(exclude = "roles")
 @DynamicInsert
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@SequenceGenerator(name = "user_seq", sequenceName = "user_sequence", allocationSize = 1)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     @Column(name = "Id", columnDefinition = "BIGINT UNSIGNED")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "Username", columnDefinition = "VARCHAR(36) NOT NULL UNIQUE")

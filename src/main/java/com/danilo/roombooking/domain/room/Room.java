@@ -3,10 +3,7 @@ package com.danilo.roombooking.domain.room;
 import com.danilo.roombooking.domain.Amenity;
 import com.danilo.roombooking.domain.Booking;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -24,10 +21,12 @@ import java.util.Set;
 @NoArgsConstructor
 @DynamicInsert
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "room_seq")
     @Column(name = "Id", columnDefinition = "BIGINT UNSIGNED")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "Identifier", columnDefinition = "VARCHAR(50) NOT NULL UNIQUE")

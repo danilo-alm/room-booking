@@ -15,12 +15,13 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = "users")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @SequenceGenerator(name = "role_seq", sequenceName = "role_sequence", allocationSize = 1)
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_seq")
     @Column(name = "Id", columnDefinition = "BIGINT UNSIGNED")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "Name", columnDefinition = "VARCHAR(50) NOT NULL UNIQUE")

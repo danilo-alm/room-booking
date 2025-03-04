@@ -4,6 +4,7 @@ import com.danilo.roombooking.domain.role.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.Set;
@@ -14,10 +15,12 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @SequenceGenerator(name = "privilege_seq", sequenceName = "privilege_sequence", allocationSize = 1)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Privilege {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "privilege_seq")
     @Column(name = "Id", columnDefinition = "BIGINT UNSIGNED")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "Name", columnDefinition = "VARCHAR(50) NOT NULL UNIQUE")

@@ -17,15 +17,16 @@ import java.sql.Timestamp;
 )
 @Data
 @Builder
-@EqualsAndHashCode
 @DynamicInsert
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @SequenceGenerator(name = "amenity_seq", sequenceName = "amenity_sequence", allocationSize = 1)
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "amenity_seq")
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @JoinColumn(name = "roomId", columnDefinition = "BIGINT UNSIGNED")
