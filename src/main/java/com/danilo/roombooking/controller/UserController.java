@@ -1,6 +1,6 @@
 package com.danilo.roombooking.controller;
 
-import com.danilo.roombooking.config.ApiPaths;
+import com.danilo.roombooking.config.web.ApiPaths;
 import com.danilo.roombooking.domain.User;
 import com.danilo.roombooking.dto.UserRequestDTO;
 import com.danilo.roombooking.dto.UserResponseDTO;

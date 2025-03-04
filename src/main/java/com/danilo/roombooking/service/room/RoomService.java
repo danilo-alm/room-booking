@@ -1,6 +1,6 @@
 package com.danilo.roombooking.service.room;
 
-import com.danilo.roombooking.config.ApiPaths;
+import com.danilo.roombooking.config.web.ApiPaths;
 import com.danilo.roombooking.domain.Amenity;
 import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.dto.RoomFilterDTO;

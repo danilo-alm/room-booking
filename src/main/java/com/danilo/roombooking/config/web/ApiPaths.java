@@ -1,4 +1,4 @@
-package com.danilo.roombooking.config;
+package com.danilo.roombooking.config.web;
 
 public final class ApiPaths {
     private ApiPaths() {}

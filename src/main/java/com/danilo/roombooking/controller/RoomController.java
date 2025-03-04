@@ -1,6 +1,6 @@
 package com.danilo.roombooking.controller;
 
-import com.danilo.roombooking.config.ApiPaths;
+import com.danilo.roombooking.config.web.ApiPaths;
 import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room.RoomStatus;
 import com.danilo.roombooking.domain.room.RoomType;

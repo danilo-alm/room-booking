@@ -1,4 +1,4 @@
-package com.danilo.roombooking.config;
+package com.danilo.roombooking.config.security;
 
 
 import org.springframework.context.annotation.Bean;
