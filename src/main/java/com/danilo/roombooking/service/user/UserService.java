@@ -1,15 +1,21 @@
 package com.danilo.roombooking.service.user;
 
-import com.danilo.roombooking.config.SecurityConstants;
+import com.danilo.roombooking.config.security.SecurityConstants;
 import com.danilo.roombooking.domain.User;
-import com.danilo.roombooking.domain.authority.Authority;
+import com.danilo.roombooking.domain.role.Role;
+import com.danilo.roombooking.domain.role.RoleType;
 import com.danilo.roombooking.dto.UserRequestDTO;
 import com.danilo.roombooking.repository.UserRepository;
+import com.danilo.roombooking.service.role.RoleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,6 +24,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
+
+    @Value("${default-admin-username}")
+    private String defaultAdminUsername;
+
+    @Value("${default-admin-password}")
+    private String defaultAdminPassword;
 
     @Transactional
     public User create(UserRequestDTO userDTO) {
@@ -33,9 +46,12 @@ public class UserService {
             .enabled(userDTO.enabled())
             .build();
 
-        if (userDTO.authorities() != null) {
-            user.setAuthorities(userDTO.authorities().stream().map(val ->
-                new Authority(user, val)).collect(Collectors.toSet()));
+        if (userDTO.roles() != null) {
+            Set<String> roleNames = userDTO.roles().stream()
+                .map(RoleType::name)
+                .collect(Collectors.toSet());
+            List<Role> roles = roleService.getByNameIn(userDTO.roles());
+            user.setRoles(new HashSet<>(roles));
         }
 
         return userRepository.saveAndFlush(user);
@@ -59,6 +75,22 @@ public class UserService {
             throw new UserNotFoundException();
         }
         userRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void createDefaultAdminIfNotExists() {
+        if (userRepository.findByUsername(defaultAdminUsername).isPresent())
+            return;
+
+        UserRequestDTO defaultAdmin = new UserRequestDTO(
+            defaultAdminUsername,
+            defaultAdminPassword,
+            "Admin",
+            true,
+            "admin@email.com",
+            Set.of(RoleType.ROLE_ADMIN)
+        );
+        create(defaultAdmin);
     }
 
     private void validateUserRequest(UserRequestDTO userRequestDTO) {

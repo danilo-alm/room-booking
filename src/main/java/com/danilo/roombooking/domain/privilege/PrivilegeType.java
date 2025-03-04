@@ -1,0 +1,28 @@
+package com.danilo.roombooking.domain.privilege;
+
+public enum PrivilegeType {
+    VIEW_USERS,
+    CREATE_USERS,
+    EDIT_USERS,
+    DELETE_USERS,
+
+    VIEW_AMENITY,
+    CREATE_AMENITY,
+    EDIT_AMENITY,
+    DELETE_AMENITY,
+
+    VIEW_ROOMS,
+    CREATE_ROOMS,
+    EDIT_ROOMS,
+    DELETE_ROOMS,
+
+    VIEW_BOOKINGS,
+    CREATE_BOOKINGS,
+    EDIT_BOOKINGS,
+    EDIT_OWN_BOOKINGS,
+    DELETE_BOOKINGS,
+    DELETE_OWN_BOOKINGS,
+
+    REQUEST_BOOKING,
+    APPROVE_BOOKING_REQUEST
+}

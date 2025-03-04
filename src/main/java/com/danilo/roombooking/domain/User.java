@@ -1,6 +1,6 @@
 package com.danilo.roombooking.domain;
 
-import com.danilo.roombooking.domain.authority.Authority;
+import com.danilo.roombooking.domain.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -16,9 +16,9 @@ import java.util.Set;
     @Index(name = "UX_Users_Username", columnList = "Username"),
 })
 @SequenceGenerator(name = "user_seq", sequenceName = "user_sequence", allocationSize = 1)
+@EqualsAndHashCode(exclude = "roles")
 @DynamicInsert
 @Data
-@EqualsAndHashCode(exclude = "authorities")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -60,6 +60,11 @@ public class User {
     @Column(name = "FailedLoginAttempts", columnDefinition = "INT NOT NULL DEFAULT 0")
     private Integer failedLoginAttempts;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    private Set<Authority> authorities;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "User_Role",
+        joinColumns = @JoinColumn(name = "UserId"),
+        inverseJoinColumns = @JoinColumn(name = "RoleId")
+    )
+    private Set<Role> roles;
 }
