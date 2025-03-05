@@ -73,16 +73,16 @@ public class RoomService {
     public Room update(Long roomId, RoomRequestDTO roomRequestDTO) {
         Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
 
-        if (roomRequestDTO.identifier() != null)
+        if (roomRequestDTO.identifier() != null && !roomRequestDTO.identifier().isBlank())
             room.setIdentifier(roomRequestDTO.identifier());
 
-        if (roomRequestDTO.name() != null)
+        if (roomRequestDTO.name() != null && !roomRequestDTO.name().isBlank())
             room.setName(roomRequestDTO.name());
 
-        if (roomRequestDTO.description() != null)
+        if (roomRequestDTO.description() != null && !roomRequestDTO.description().isBlank())
             room.setDescription(roomRequestDTO.description());
 
-        if (roomRequestDTO.capacity() != null)
+        if (roomRequestDTO.capacity() != null && roomRequestDTO.capacity() > 0)
             room.setCapacity(roomRequestDTO.capacity());
 
         if (roomRequestDTO.status() != null)
@@ -101,9 +101,9 @@ public class RoomService {
 
     @Transactional
     public void delete(Long id) {
-        if (!roomRepository.existsById(id)) {
+        if (!roomRepository.existsById(id))
             throw new RoomNotFoundException();
-        }
+
         roomRepository.deleteById(id);
     }
 
