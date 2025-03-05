@@ -49,8 +49,8 @@ public class UserService {
 
         user.setRoles(
             userDTO.roles() == null
-            ? new HashSet<>() :
-            new HashSet<>(roleService.getByNameIn(userDTO.roles()))
+            ? new HashSet<>()
+            : new HashSet<>(roleService.getByNameIn(userDTO.roles()))
         );
 
         return userRepository.saveAndFlush(user);
