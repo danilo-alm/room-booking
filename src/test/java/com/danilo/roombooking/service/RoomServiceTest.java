@@ -4,8 +4,8 @@ import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room.RoomStatus;
 import com.danilo.roombooking.domain.room.RoomType;
 import com.danilo.roombooking.dto.RoomRequestDTO;
-import com.danilo.roombooking.repository.AmenityRepository;
 import com.danilo.roombooking.repository.RoomRepository;
+import com.danilo.roombooking.service.amenity.AmenityService;
 import com.danilo.roombooking.service.room.RoomNotFoundException;
 import com.danilo.roombooking.service.room.RoomService;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +30,7 @@ public class RoomServiceTest {
     private RoomRepository roomRepository;
 
     @Mock
-    private AmenityRepository amenityRepository;
+    private AmenityService amenityService;
 
     @InjectMocks
     private RoomService roomService;
@@ -52,7 +52,7 @@ public class RoomServiceTest {
     @Test
     public void RoomService_Create_ReturnsCreatedRoom() {
         when(roomRepository.saveAndFlush(any(Room.class))).thenReturn(room);
-        when(amenityRepository.findByIdIn(anyCollection())).thenReturn(List.of());
+        when(amenityService.getByIdIn(anyCollection())).thenReturn(List.of());
 
         Room response = roomService.create(requestDTO);
 
@@ -90,7 +90,7 @@ public class RoomServiceTest {
     @Test
     public void RoomService_Update_ReturnsUpdatedRoom() {
         requestDTO = createRoomRequestDTO("R101", "Updated Classroom", 60);
-        when(amenityRepository.findByIdIn(anyCollection())).thenReturn(List.of());
+        when(amenityService.getByIdIn(anyCollection())).thenReturn(List.of());
 
         when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
 
