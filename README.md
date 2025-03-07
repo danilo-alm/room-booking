@@ -164,7 +164,7 @@ Room Booking API is a system that allows users to register rooms (such as univer
 
 ## TODO 📝
 - 🔐 JWT authentication (Next Task)
-- 🔒 Secure endpoints (In progress)
+- 🔒 Secure endpoints (Done ✅)
 - 👑 Create a default admin user (Done ✅)
 - 🧪 Integration tests
 - 🐳 Full dockerization
