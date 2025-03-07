@@ -29,6 +29,7 @@ public final class ApiPaths {
         public static final String ROOT = BASE_API + "/amenity";
         public static final String CREATE = "";
         public static final String GET = "";
+        public static final String GET_BY_ID = "/id/{id}";
         public static final String DELETE = "/{id}";
     }
 

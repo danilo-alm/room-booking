@@ -32,6 +32,11 @@ public class AmenityService {
         return amenityRepository.findAll(pageable);
     }
 
+    public Amenity getById(Long id) {
+        return amenityRepository.findById(id).orElseThrow(() ->
+            new AmenityNotFoundException("amenity not found"));
+    }
+
     public Page<Amenity> getWithPrefix(String prefix, Pageable pageable) {
         return amenityRepository.findByNameStartingWithIgnoreCase(prefix, pageable);
     }

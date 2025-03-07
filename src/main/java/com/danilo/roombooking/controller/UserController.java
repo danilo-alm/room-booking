@@ -6,9 +6,10 @@ import com.danilo.roombooking.dto.UserRequestDTO;
 import com.danilo.roombooking.dto.UserResponseDTO;
 import com.danilo.roombooking.service.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
@@ -20,15 +21,18 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping(ApiPaths.User.CREATE)
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<UserResponseDTO> create(@RequestBody UserRequestDTO userDTO) {
         UserResponseDTO user = new UserResponseDTO(userService.create(userDTO));
-        URI loc = UriComponentsBuilder.fromPath(ApiPaths.User.GET)
+        URI loc = ServletUriComponentsBuilder.fromCurrentRequest()
+            .path(ApiPaths.User.GET)
             .queryParam("id", user.id())
             .build().toUri();
         return ResponseEntity.created(loc).body(user);
     }
 
     @GetMapping(ApiPaths.User.GET)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<UserResponseDTO> getByIdOrUsernameOrEmail(
         @RequestParam(required = false) Long id,
         @RequestParam(required = false) String username,
@@ -48,6 +52,7 @@ public class UserController {
     }
 
     @DeleteMapping(ApiPaths.User.DELETE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();

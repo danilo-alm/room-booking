@@ -12,9 +12,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,28 +31,37 @@ public class RoomController {
     @PostMapping(ApiPaths.Room.CREATE)
     public ResponseEntity<RoomResponseDTO> create(@RequestBody RoomRequestDTO roomRequestDTO) {
         Room room = roomService.create(roomRequestDTO);
-        return ResponseEntity.ok(new RoomResponseDTO(room));
+        URI loc = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path(ApiPaths.Room.GET_BY_ID)
+            .buildAndExpand(room.getId())
+            .toUri();
+        return ResponseEntity.created(loc).body(new RoomResponseDTO(room));
     }
 
     @GetMapping(ApiPaths.Room.GET)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Page<RoomResponseDTO>> getAll(@PageableDefault Pageable pageable) {
         Page<Room> rooms = roomService.getAll(pageable);
         return ResponseEntity.ok(rooms.map(RoomResponseDTO::new));
     }
 
     @GetMapping(ApiPaths.Room.GET_BY_ID)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<RoomResponseDTO> getById(@PathVariable Long id) {
         Room room = roomService.getById(id);
         return ResponseEntity.ok(new RoomResponseDTO(room));
     }
 
     @GetMapping(ApiPaths.Room.GET_BY_IDENTIFIER)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<RoomResponseDTO> getByIdentifier(@PathVariable String identifier) {
         Room room = roomService.getByIdentifier(identifier);
         return ResponseEntity.ok(new RoomResponseDTO(room));
     }
 
     @GetMapping(ApiPaths.Room.GET_FILTER)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Page<RoomResponseDTO>> getFilter(
         @RequestParam(required = false) String name,
         @RequestParam(required = false) Integer minCapacity,
@@ -65,6 +77,7 @@ public class RoomController {
     }
 
     @PutMapping(ApiPaths.Room.UPDATE)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<RoomResponseDTO> update(
         @PathVariable("id") Long id,
         @RequestBody RoomRequestDTO roomRequestDTO
@@ -74,17 +87,20 @@ public class RoomController {
     }
 
     @DeleteMapping(ApiPaths.Room.DELETE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         roomService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping(ApiPaths.Room.GET_TYPES)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Map<String, String>> getRoomTypes() {
         return ResponseEntity.ok(RoomType.getMap());
     }
 
     @GetMapping(ApiPaths.Room.GET_STATUS)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Map<String, String>> getRoomStatus() {
         return ResponseEntity.ok(RoomStatus.getMap());
     }
