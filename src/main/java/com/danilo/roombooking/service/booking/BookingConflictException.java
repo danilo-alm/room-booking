@@ -2,6 +2,6 @@ package com.danilo.roombooking.service.booking;
 
 public class BookingConflictException extends RuntimeException {
     public BookingConflictException() {
-        super("The room is occupied during the requested time slot.");
+        super("Room is unavailable or occupied during the requested time slot.");
     }
 }

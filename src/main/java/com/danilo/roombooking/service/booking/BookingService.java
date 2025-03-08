@@ -34,7 +34,7 @@ public class BookingService {
 
         Room room = roomService.getById(bookingRequestDTO.roomId());
         if (room.getStatus() != RoomStatus.AVAILABLE)
-            throw new UnavailableRoomException("Room is not available.");
+            throw new BookingConflictException();
 
         User user = userService.getById(bookingRequestDTO.userId());
 

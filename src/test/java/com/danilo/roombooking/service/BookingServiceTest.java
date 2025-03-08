@@ -6,7 +6,10 @@ import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room.RoomStatus;
 import com.danilo.roombooking.dto.BookingRequestDTO;
 import com.danilo.roombooking.repository.BookingRepository;
-import com.danilo.roombooking.service.booking.*;
+import com.danilo.roombooking.service.booking.BookingConflictException;
+import com.danilo.roombooking.service.booking.BookingNotFoundException;
+import com.danilo.roombooking.service.booking.BookingService;
+import com.danilo.roombooking.service.booking.InvalidBookingException;
 import com.danilo.roombooking.service.room.RoomService;
 import com.danilo.roombooking.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -128,7 +131,7 @@ public class BookingServiceTest {
 
         when(roomService.getById(bookingRequestDTO.roomId())).thenReturn(room);
 
-        UnavailableRoomException exception = assertThrows(UnavailableRoomException.class, () -> bookingService.create(bookingRequestDTO));
+        BookingConflictException exception = assertThrows(BookingConflictException.class, () -> bookingService.create(bookingRequestDTO));
 
         verify(roomService).getById(bookingRequestDTO.roomId());
         assertEquals("Room is not available.", exception.getMessage());

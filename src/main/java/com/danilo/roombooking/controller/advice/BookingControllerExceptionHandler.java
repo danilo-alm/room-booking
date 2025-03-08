@@ -3,7 +3,6 @@ package com.danilo.roombooking.controller.advice;
 import com.danilo.roombooking.service.booking.BookingConflictException;
 import com.danilo.roombooking.service.booking.BookingNotFoundException;
 import com.danilo.roombooking.service.booking.InvalidBookingException;
-import com.danilo.roombooking.service.booking.UnavailableRoomException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,12 +27,6 @@ public class BookingControllerExceptionHandler {
     @ExceptionHandler(InvalidBookingException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleInvalidBookingException(InvalidBookingException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(UnavailableRoomException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleUnavailableRoomException(UnavailableRoomException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
