@@ -10,7 +10,7 @@ public record BookingResponseDTO(Long id, Long roomId, Long userId, Timestamp st
         this(
             booking.getId(),
             booking.getRoom().getId(),
-            booking.getUser().getId(),
+            booking.getCreatedBy().getId(),
             booking.getStartTime(),
             booking.getEndTime(),
             booking.getCreatedAt(),

@@ -12,7 +12,6 @@ import java.sql.Timestamp;
     uniqueConstraints = {@UniqueConstraint(name = "UQ_Booking", columnNames = {"RoomId", "StartTime", "EndTime"})},
     indexes = {
         @Index(name = "IX_Booking", columnList = "RoomId, StartTime, EndTime"),
-        @Index(name = "IX_Booking_UserId", columnList = "UserId")
     }
 )
 @Data
@@ -29,19 +28,25 @@ public class Booking {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @JoinColumn(name = "roomId", columnDefinition = "BIGINT UNSIGNED")
+    @JoinColumn(name = "roomId", columnDefinition = "BIGINT UNSIGNED NOT NULL")
     @ManyToOne(fetch = FetchType.LAZY)
     private Room room;
 
-    @JoinColumn(name = "UserId", columnDefinition = "BIGINT UNSIGNED")
+    @JoinColumn(name = "CreatedBy", columnDefinition = "BIGINT UNSIGNED NOT NULL")
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private User createdBy;
 
     @Column(name = "StartTime", columnDefinition = "TIMESTAMP NOT NULL")
     private Timestamp startTime;
 
     @Column(name = "EndTime", columnDefinition = "TIMESTAMP NOT NULL")
     private Timestamp endTime;
+
+    @Column(name = "Approved", columnDefinition = "BOOLEAN NOT NULL DEFAULT FALSE")
+    private Boolean approved;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User approvedBy;
 
     @Column(name = "CreatedAt", columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
     private Timestamp createdAt;

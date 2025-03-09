@@ -194,7 +194,7 @@ public class BookingServiceTest {
         when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
         when(bookingRepository.isRoomBookedDuringTimeRangeExcludingCurrentBooking(any(), any(), any(), any())).thenReturn(false);
 
-        BookingRequestDTO updateRequest = new BookingRequestDTO(booking.getRoom().getId(), booking.getUser().getId(), new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis() + 3600000));
+        BookingRequestDTO updateRequest = new BookingRequestDTO(booking.getRoom().getId(), booking.getCreatedBy().getId(), new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis() + 3600000));
 
         Booking response = bookingService.update(booking.getId(), updateRequest);
 

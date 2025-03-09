@@ -84,7 +84,7 @@ public class BookingService {
 
         BookingRequestDTO updateDTO = new BookingRequestDTO(
             booking.getRoom().getId(),
-            booking.getUser().getId(),
+            booking.getCreatedBy().getId(),
             startTime != null ? startTime : booking.getStartTime(),
             endTime != null ? endTime : booking.getEndTime()
         );

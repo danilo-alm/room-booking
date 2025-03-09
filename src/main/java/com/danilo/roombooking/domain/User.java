@@ -11,10 +11,7 @@ import java.sql.Timestamp;
 import java.util.Set;
 
 @Entity
-@Table(name = "Users", indexes = {
-    @Index(name = "UX_Users_Email", columnList = "Email"),
-    @Index(name = "UX_Users_Username", columnList = "Username"),
-})
+@Table(name = "Users")
 @DynamicInsert
 @Data
 @Builder
@@ -44,8 +41,11 @@ public class User {
     @Column(name = "FullName", columnDefinition = "VARCHAR(100) NOT NULL")
     private String fullName;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "createdBy", orphanRemoval = true)
     private Set<Booking> bookings;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "approvedBy", orphanRemoval = true)
+    private Set<Booking> bookingsApproved;
 
     @CreationTimestamp
     @Column(name = "CreatedAt", columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
