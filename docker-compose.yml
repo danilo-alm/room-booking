@@ -1,0 +1,17 @@
+services:
+  mariadb:
+    image: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DATABASE_PASSWORD:-root}
+      - MYSQL_DATABASE=${DATABASE_NAME:-room-booking}
+    ports:
+      - "${DATABASE_PORT:-3457}:3306"
+
+  redis:
+    image: redis:7.4.2
+    restart: always
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - ./redis:/data
