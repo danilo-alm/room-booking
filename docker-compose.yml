@@ -1,8 +1,10 @@
 services:
-  db:
-    image: mariadb
+  mariadb:
+    image: mariadb:11.7.2
     environment:
       - MYSQL_ROOT_PASSWORD=${DATABASE_PASSWORD:-root}
       - MYSQL_DATABASE=${DATABASE_NAME:-room-booking}
     ports:
       - "${DATABASE_PORT:-3457}:3306"
+    volumes:
+      - ./mariadb:/var/lib/mysql
