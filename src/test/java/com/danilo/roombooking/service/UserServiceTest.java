@@ -5,7 +5,7 @@ import com.danilo.roombooking.domain.User;
 import com.danilo.roombooking.domain.role.Role;
 import com.danilo.roombooking.domain.role.RoleType;
 import com.danilo.roombooking.dto.UserRequestDTO;
-import com.danilo.roombooking.repository.UserRepository;
+import com.danilo.roombooking.repository.jpa.UserJpaRepository;
 import com.danilo.roombooking.service.role.RoleService;
 import com.danilo.roombooking.service.user.InvalidUserException;
 import com.danilo.roombooking.service.user.UserNotFoundException;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*;
 public class UserServiceTest {
 
     @Mock
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @Mock
     private RoleService roleService;
@@ -66,14 +66,14 @@ public class UserServiceTest {
     @Test
     public void UserService_Create_CreatesUser() {
         when(passwordEncoder.encode(userDTO.password())).thenReturn("encodedPassword");
-        when(userRepository.saveAndFlush(any(User.class))).thenReturn(user);
+        when(userJpaRepository.saveAndFlush(any(User.class))).thenReturn(user);
         when(roleService.getByNameIn(anyCollection())).thenReturn(List.of());
 
         User response = userService.create(userDTO);
 
         assertNotNull(response);
         assertEquals(userDTO.username(), response.getUsername());
-        verify(userRepository).saveAndFlush(any(User.class));
+        verify(userJpaRepository).saveAndFlush(any(User.class));
         verify(passwordEncoder).encode(userDTO.password());
     }
 
@@ -133,63 +133,63 @@ public class UserServiceTest {
 
     @Test
     public void UserService_GetById_ReturnsUser() {
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userJpaRepository.findById(user.getId())).thenReturn(Optional.of(user));
         User response = userService.getById(user.getId());
 
         assertNotNull(response);
         assertEquals(user.getId(), response.getId());
-        verify(userRepository).findById(user.getId());
+        verify(userJpaRepository).findById(user.getId());
     }
 
     @Test
     public void UserService_GetById_ThrowsException_WhenUserNotFound() {
-        when(userRepository.findById(any())).thenReturn(Optional.empty());
+        when(userJpaRepository.findById(any())).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> userService.getById(user.getId()));
     }
 
     @Test
     public void UserService_GetByUsername_ReturnsUser() {
-        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
+        when(userJpaRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
         User response = userService.getByUsername(user.getUsername());
 
         assertNotNull(response);
         assertEquals(user.getUsername(), response.getUsername());
-        verify(userRepository).findByUsername(user.getUsername());
+        verify(userJpaRepository).findByUsername(user.getUsername());
     }
 
     @Test
     public void UserService_GetByUsername_ThrowsException_WhenUserNotFound() {
-        when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
+        when(userJpaRepository.findByUsername(any())).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> userService.getByUsername(user.getUsername()));
     }
 
     @Test
     public void UserService_GetByEmail_ReturnsUser() {
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userJpaRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         User response = userService.getByEmail(user.getEmail());
 
         assertNotNull(response);
         assertEquals(user.getEmail(), response.getEmail());
-        verify(userRepository).findByEmail(user.getEmail());
+        verify(userJpaRepository).findByEmail(user.getEmail());
     }
 
     @Test
     public void UserService_Delete_DeletesUser() {
-        when(userRepository.existsById(user.getId())).thenReturn(true);
-        doNothing().when(userRepository).deleteById(user.getId());
+        when(userJpaRepository.existsById(user.getId())).thenReturn(true);
+        doNothing().when(userJpaRepository).deleteById(user.getId());
 
         assertDoesNotThrow(() -> userService.delete(user.getId()));
-        verify(userRepository).existsById(user.getId());
-        verify(userRepository).deleteById(user.getId());
+        verify(userJpaRepository).existsById(user.getId());
+        verify(userJpaRepository).deleteById(user.getId());
     }
 
     @Test
     public void UserService_Delete_ThrowsException_WhenUserNotFound() {
-        when(userRepository.existsById(any())).thenReturn(false);
+        when(userJpaRepository.existsById(any())).thenReturn(false);
         assertThrows(UserNotFoundException.class, () -> userService.delete(user.getId()));
 
-        verify(userRepository).existsById(any());
-        verify(userRepository, never()).deleteById(any());
+        verify(userJpaRepository).existsById(any());
+        verify(userJpaRepository, never()).deleteById(any());
     }
 
     static Stream<String> provideShortPasswords() {

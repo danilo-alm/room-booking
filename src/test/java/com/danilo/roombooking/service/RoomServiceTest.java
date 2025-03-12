@@ -4,7 +4,7 @@ import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room.RoomStatus;
 import com.danilo.roombooking.domain.room.RoomType;
 import com.danilo.roombooking.dto.RoomRequestDTO;
-import com.danilo.roombooking.repository.RoomRepository;
+import com.danilo.roombooking.repository.jpa.RoomJpaRepository;
 import com.danilo.roombooking.service.amenity.AmenityService;
 import com.danilo.roombooking.service.room.RoomNotFoundException;
 import com.danilo.roombooking.service.room.RoomService;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 public class RoomServiceTest {
 
     @Mock
-    private RoomRepository roomRepository;
+    private RoomJpaRepository roomJpaRepository;
 
     @Mock
     private AmenityService amenityService;
@@ -51,7 +51,7 @@ public class RoomServiceTest {
 
     @Test
     public void RoomService_Create_ReturnsCreatedRoom() {
-        when(roomRepository.saveAndFlush(any(Room.class))).thenReturn(room);
+        when(roomJpaRepository.saveAndFlush(any(Room.class))).thenReturn(room);
         when(amenityService.getByIdIn(anyCollection())).thenReturn(List.of());
 
         Room response = roomService.create(requestDTO);
@@ -59,32 +59,32 @@ public class RoomServiceTest {
         assertNotNull(response);
         assertEquals("R101", response.getIdentifier());
 
-        verify(roomRepository).saveAndFlush(any(Room.class));
+        verify(roomJpaRepository).saveAndFlush(any(Room.class));
     }
 
     @Test
     public void RoomService_GetById_ReturnsRoom() {
-        when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
+        when(roomJpaRepository.findById(roomId)).thenReturn(Optional.of(room));
 
         Room response = roomService.getById(roomId);
 
         assertNotNull(response);
         assertEquals("R101", response.getIdentifier());
 
-        verify(roomRepository).findById(roomId);
+        verify(roomJpaRepository).findById(roomId);
     }
 
     @Test
     public void RoomService_GetByIdentifier_ReturnsRoom() {
         String identifier = room.getIdentifier();
-        when(roomRepository.findByIdentifier(identifier)).thenReturn(Optional.of(room));
+        when(roomJpaRepository.findByIdentifier(identifier)).thenReturn(Optional.of(room));
 
         Room response = roomService.getByIdentifier(identifier);
 
         assertNotNull(response);
         assertEquals("R101", response.getIdentifier());
 
-        verify(roomRepository).findByIdentifier(identifier);
+        verify(roomJpaRepository).findByIdentifier(identifier);
     }
 
     @Test
@@ -92,43 +92,43 @@ public class RoomServiceTest {
         requestDTO = createRoomRequestDTO("R101", "Updated Classroom", 60);
         when(amenityService.getByIdIn(anyCollection())).thenReturn(List.of());
 
-        when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
+        when(roomJpaRepository.findById(roomId)).thenReturn(Optional.of(room));
 
         Room response = roomService.update(roomId, requestDTO);
 
         assertNotNull(response);
         assertEquals(60, response.getCapacity());
 
-        verify(roomRepository).findById(roomId);
+        verify(roomJpaRepository).findById(roomId);
     }
 
     @Test
     public void RoomService_Update_ThrowsException_WhenRoomNotFound() {
-        when(roomRepository.findById(roomId)).thenReturn(Optional.empty());
+        when(roomJpaRepository.findById(roomId)).thenReturn(Optional.empty());
 
         assertThrows(RoomNotFoundException.class, () -> roomService.update(roomId, requestDTO));
 
-        verify(roomRepository).findById(roomId);
+        verify(roomJpaRepository).findById(roomId);
     }
 
     @Test
     public void RoomService_Delete_DeletesRoom() {
-        when(roomRepository.existsById(roomId)).thenReturn(true);
+        when(roomJpaRepository.existsById(roomId)).thenReturn(true);
 
         roomService.delete(roomId);
 
-        verify(roomRepository).existsById(roomId);
-        verify(roomRepository).deleteById(roomId);
+        verify(roomJpaRepository).existsById(roomId);
+        verify(roomJpaRepository).deleteById(roomId);
     }
 
     @Test
     public void RoomService_Delete_ThrowsException_WhenRoomNotFound() {
-        when(roomRepository.existsById(roomId)).thenReturn(false);
+        when(roomJpaRepository.existsById(roomId)).thenReturn(false);
 
         assertThrows(RoomNotFoundException.class, () -> roomService.delete(roomId));
 
-        verify(roomRepository).existsById(roomId);
-        verify(roomRepository, never()).deleteById(roomId);
+        verify(roomJpaRepository).existsById(roomId);
+        verify(roomJpaRepository, never()).deleteById(roomId);
     }
 
     private Room createRoom(Long roomId, String identifier, String name, int capacity) {

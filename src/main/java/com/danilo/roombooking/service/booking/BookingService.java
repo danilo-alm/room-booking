@@ -6,7 +6,7 @@ import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room.RoomStatus;
 import com.danilo.roombooking.dto.BookingFilterDTO;
 import com.danilo.roombooking.dto.BookingRequestDTO;
-import com.danilo.roombooking.repository.BookingRepository;
+import com.danilo.roombooking.repository.jpa.BookingJpaRepository;
 import com.danilo.roombooking.service.room.RoomService;
 import com.danilo.roombooking.service.user.UserService;
 import com.danilo.roombooking.specification.BookingSpecification;
@@ -25,7 +25,7 @@ public class BookingService {
 
     private final UserService userService;
     private final RoomService roomService;
-    private final BookingRepository bookingRepository;
+    private final BookingJpaRepository bookingJpaRepository;
 
     @Transactional
     public Booking create(BookingRequestDTO bookingRequestDTO) {
@@ -45,23 +45,23 @@ public class BookingService {
             .endTime(bookingRequestDTO.endTime())
             .build();
 
-        return bookingRepository.save(booking);
+        return bookingJpaRepository.save(booking);
     }
 
     public Page<Booking> getAll(Pageable pageable) {
-        return bookingRepository.findAll(pageable);
+        return bookingJpaRepository.findAll(pageable);
     }
 
     public Booking getById(Long bookingId) {
-        return bookingRepository.findById(bookingId).orElseThrow(BookingNotFoundException::new);
+        return bookingJpaRepository.findById(bookingId).orElseThrow(BookingNotFoundException::new);
     }
 
     public Page<Booking> getByUserId(Long userId, Pageable pageable) {
-        return bookingRepository.findByUserId(userId, pageable);
+        return bookingJpaRepository.findByUserId(userId, pageable);
     }
 
     public Page<Booking> getByRoomId(Long roomId, Pageable pageable) {
-        return bookingRepository.findByRoomId(roomId, pageable);
+        return bookingJpaRepository.findByRoomId(roomId, pageable);
     }
 
     public Page<Booking> getFilter(BookingFilterDTO bookingFilterDTO, Pageable pageable) {
@@ -72,7 +72,7 @@ public class BookingService {
             .and(BookingSpecification.hasEndTimeLessThanOrEqualTo(bookingFilterDTO.maxEndTime())))
         );
 
-        return bookingRepository.findAll(spec, pageable);
+        return bookingJpaRepository.findAll(spec, pageable);
     }
 
     @Transactional
@@ -98,10 +98,10 @@ public class BookingService {
     }
 
     public void delete(Long bookingId) {
-        if (!bookingRepository.existsById(bookingId)) {
+        if (!bookingJpaRepository.existsById(bookingId)) {
             throw new BookingNotFoundException();
         }
-        bookingRepository.deleteById(bookingId);
+        bookingJpaRepository.deleteById(bookingId);
     }
 
     private void validateBookingRequest(BookingRequestDTO bookingRequestDTO) {
@@ -122,14 +122,14 @@ public class BookingService {
     }
 
     private void checkRoomAvailabilityInTimeInterval(BookingRequestDTO bookingRequestDTO) {
-        boolean isUnavailable = bookingRepository.isRoomBookedDuringTimeRange(
+        boolean isUnavailable = bookingJpaRepository.isRoomBookedDuringTimeRange(
             bookingRequestDTO.roomId(), bookingRequestDTO.startTime(), bookingRequestDTO.endTime());
 
         if (isUnavailable) throw new BookingConflictException();
     }
 
     private void checkRoomUpdateAvailabilityInTimeInterval(Long bookingId, BookingRequestDTO bookingRequestDTO) {
-        boolean conflicts = bookingRepository.isRoomBookedDuringTimeRangeExcludingCurrentBooking(
+        boolean conflicts = bookingJpaRepository.isRoomBookedDuringTimeRangeExcludingCurrentBooking(
             bookingRequestDTO.roomId(), bookingId, bookingRequestDTO.startTime(), bookingRequestDTO.endTime());
 
         if (conflicts) throw new BookingConflictException();

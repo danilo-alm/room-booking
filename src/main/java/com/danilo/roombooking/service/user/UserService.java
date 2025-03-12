@@ -6,7 +6,7 @@ import com.danilo.roombooking.domain.privilege.PrivilegeType;
 import com.danilo.roombooking.domain.role.Role;
 import com.danilo.roombooking.domain.role.RoleType;
 import com.danilo.roombooking.dto.UserRequestDTO;
-import com.danilo.roombooking.repository.UserRepository;
+import com.danilo.roombooking.repository.jpa.UserJpaRepository;
 import com.danilo.roombooking.service.role.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +23,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
 
@@ -53,19 +53,19 @@ public class UserService {
             : new HashSet<>(roleService.getByNameIn(userDTO.roles()))
         );
 
-        return userRepository.saveAndFlush(user);
+        return userJpaRepository.saveAndFlush(user);
     }
 
     public User getById(Long id) {
-        return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        return userJpaRepository.findById(id).orElseThrow(UserNotFoundException::new);
     }
 
     public User getByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+        return userJpaRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
     }
 
     public User getByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        return userJpaRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
     }
 
     @Transactional
@@ -107,15 +107,15 @@ public class UserService {
 
     @Transactional
     public void delete(Long id) {
-        if (!userRepository.existsById(id)) {
+        if (!userJpaRepository.existsById(id)) {
             throw new UserNotFoundException();
         }
-        userRepository.deleteById(id);
+        userJpaRepository.deleteById(id);
     }
 
     @Transactional
     public void createDefaultAdminIfNotExists() {
-        if (userRepository.findByUsername(defaultAdminUsername).isPresent())
+        if (userJpaRepository.findByUsername(defaultAdminUsername).isPresent())
             return;
 
         UserRequestDTO defaultAdmin = new UserRequestDTO(

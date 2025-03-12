@@ -2,7 +2,7 @@ package com.danilo.roombooking.service;
 
 import com.danilo.roombooking.domain.privilege.Privilege;
 import com.danilo.roombooking.domain.privilege.PrivilegeType;
-import com.danilo.roombooking.repository.PrivilegeRepository;
+import com.danilo.roombooking.repository.jpa.PrivilegeJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PrivilegeService {
 
-    private final PrivilegeRepository privilegeRepository;
+    private final PrivilegeJpaRepository privilegeJpaRepository;
 
     @Transactional
     public void populateDatabase() {
-        Set<PrivilegeType> existingPrivileges = privilegeRepository.findAll().stream()
+        Set<PrivilegeType> existingPrivileges = privilegeJpaRepository.findAll().stream()
             .map(Privilege::getName)
             .collect(Collectors.toSet());
 
@@ -29,6 +29,6 @@ public class PrivilegeService {
             .collect(Collectors.toSet());
 
         if (!newPrivileges.isEmpty())
-            privilegeRepository.saveAll(newPrivileges);
+            privilegeJpaRepository.saveAll(newPrivileges);
     }
 }

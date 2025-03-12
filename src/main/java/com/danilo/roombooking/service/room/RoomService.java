@@ -5,7 +5,7 @@ import com.danilo.roombooking.domain.Amenity;
 import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.dto.RoomFilterDTO;
 import com.danilo.roombooking.dto.RoomRequestDTO;
-import com.danilo.roombooking.repository.RoomRepository;
+import com.danilo.roombooking.repository.jpa.RoomJpaRepository;
 import com.danilo.roombooking.service.amenity.AmenityService;
 import com.danilo.roombooking.specification.RoomSpecification;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoomService {
 
-    private final RoomRepository roomRepository;
+    private final RoomJpaRepository roomJpaRepository;
     private final AmenityService amenityService;
 
     @Transactional
@@ -41,19 +41,19 @@ public class RoomService {
         List<Amenity> amenities = amenityService.getByIdIn(roomRequestDTO.amenitiesIds());
         room.setAmenities(new HashSet<>(amenities));
 
-        return roomRepository.saveAndFlush(room);
+        return roomJpaRepository.saveAndFlush(room);
     }
 
     public Page<Room> getAll(Pageable pageable) {
-        return roomRepository.findAll(pageable);
+        return roomJpaRepository.findAll(pageable);
     }
 
     public Room getById(Long id) {
-        return roomRepository.findById(id).orElseThrow(RoomNotFoundException::new);
+        return roomJpaRepository.findById(id).orElseThrow(RoomNotFoundException::new);
     }
 
     public Room getByIdentifier(String identifier) {
-        return roomRepository.findByIdentifier(identifier).orElseThrow(RoomNotFoundException::new);
+        return roomJpaRepository.findByIdentifier(identifier).orElseThrow(RoomNotFoundException::new);
     }
 
     @Transactional(readOnly = true)
@@ -66,12 +66,12 @@ public class RoomService {
             .and(RoomSpecification.hasType(filterDTO.type()))
             .and(RoomSpecification.hasAmenities(filterDTO.amenityIds()));
 
-        return roomRepository.findAll(spec, pageable);
+        return roomJpaRepository.findAll(spec, pageable);
     }
 
     @Transactional
     public Room update(Long roomId, RoomRequestDTO roomRequestDTO) {
-        Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
+        Room room = roomJpaRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
 
         if (roomRequestDTO.identifier() != null && !roomRequestDTO.identifier().isBlank())
             room.setIdentifier(roomRequestDTO.identifier());
@@ -101,10 +101,10 @@ public class RoomService {
 
     @Transactional
     public void delete(Long id) {
-        if (!roomRepository.existsById(id))
+        if (!roomJpaRepository.existsById(id))
             throw new RoomNotFoundException();
 
-        roomRepository.deleteById(id);
+        roomJpaRepository.deleteById(id);
     }
 
     private void validateRoomRequest(RoomRequestDTO roomRequestDTO) {

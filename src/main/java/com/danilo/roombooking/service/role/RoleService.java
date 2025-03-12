@@ -4,8 +4,8 @@ import com.danilo.roombooking.domain.privilege.Privilege;
 import com.danilo.roombooking.domain.privilege.PrivilegeType;
 import com.danilo.roombooking.domain.role.Role;
 import com.danilo.roombooking.domain.role.RoleType;
-import com.danilo.roombooking.repository.PrivilegeRepository;
-import com.danilo.roombooking.repository.RoleRepository;
+import com.danilo.roombooking.repository.jpa.PrivilegeJpaRepository;
+import com.danilo.roombooking.repository.jpa.RoleJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RoleService {
 
-    private final RoleRepository roleRepository;
-    private final PrivilegeRepository privilegeRepository;
+    private final RoleJpaRepository roleJpaRepository;
+    private final PrivilegeJpaRepository privilegeJpaRepository;
 
     public List<Role> getByNameIn(Collection<RoleType> roles) {
-        List<Role> foundRoles = roleRepository.findByNameIn(roles);
+        List<Role> foundRoles = roleJpaRepository.findByNameIn(roles);
         if (foundRoles.size() == roles.size())
             return foundRoles;
 
@@ -34,11 +34,11 @@ public class RoleService {
 
     @Transactional
     public void populateDatabase() {
-        Set<RoleType> existingRoles = roleRepository.findAll().stream()
+        Set<RoleType> existingRoles = roleJpaRepository.findAll().stream()
             .map(Role::getName)
             .collect(Collectors.toSet());
 
-        Set<Privilege> allPrivileges = new HashSet<>(privilegeRepository.findAll());
+        Set<Privilege> allPrivileges = new HashSet<>(privilegeJpaRepository.findAll());
 
         Map<PrivilegeType, Privilege> privilegeMap = allPrivileges.stream()
             .collect(Collectors.toMap(Privilege::getName, privilege -> privilege));
@@ -54,7 +54,7 @@ public class RoleService {
             .collect(Collectors.toSet());
 
         if (!newRoles.isEmpty())
-            roleRepository.saveAll(newRoles);
+            roleJpaRepository.saveAll(newRoles);
     }
 
 }

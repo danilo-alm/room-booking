@@ -1,7 +1,7 @@
 package com.danilo.roombooking.config.security;
 
 import com.danilo.roombooking.domain.User;
-import com.danilo.roombooking.repository.UserRepository;
+import com.danilo.roombooking.repository.jpa.UserJpaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,12 +19,12 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new
+        User user = userJpaRepository.findByUsername(username).orElseThrow(() -> new
             UsernameNotFoundException(username));
 
         return new org.springframework.security.core.userdetails.User(

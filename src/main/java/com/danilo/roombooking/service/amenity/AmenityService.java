@@ -2,7 +2,7 @@ package com.danilo.roombooking.service.amenity;
 
 import com.danilo.roombooking.domain.Amenity;
 import com.danilo.roombooking.dto.AmenityRequestDTO;
-import com.danilo.roombooking.repository.AmenityRepository;
+import com.danilo.roombooking.repository.jpa.AmenityJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AmenityService {
 
-    private final AmenityRepository amenityRepository;
+    private final AmenityJpaRepository amenityJpaRepository;
 
     public Amenity create(AmenityRequestDTO amenityRequestDTO) {
         validateAmenityRequest(amenityRequestDTO);
@@ -25,24 +25,24 @@ public class AmenityService {
         Amenity amenity = new Amenity();
         amenity.setName(amenityRequestDTO.name());
 
-        return amenityRepository.save(amenity);
+        return amenityJpaRepository.save(amenity);
     }
 
     public Page<Amenity> getAll(Pageable pageable) {
-        return amenityRepository.findAll(pageable);
+        return amenityJpaRepository.findAll(pageable);
     }
 
     public Amenity getById(Long id) {
-        return amenityRepository.findById(id).orElseThrow(() ->
+        return amenityJpaRepository.findById(id).orElseThrow(() ->
             new AmenityNotFoundException("amenity not found"));
     }
 
     public Page<Amenity> getWithPrefix(String prefix, Pageable pageable) {
-        return amenityRepository.findByNameStartingWithIgnoreCase(prefix, pageable);
+        return amenityJpaRepository.findByNameStartingWithIgnoreCase(prefix, pageable);
     }
 
     public List<Amenity> getByIdIn(Collection<Long> ids) {
-        List<Amenity> amenities = amenityRepository.findByIdIn(ids);
+        List<Amenity> amenities = amenityJpaRepository.findByIdIn(ids);
         if (amenities.size() == ids.size())
             return amenities;
 
@@ -54,10 +54,10 @@ public class AmenityService {
     }
 
     public void delete(Long id) {
-        if (!amenityRepository.existsById(id)) {
+        if (!amenityJpaRepository.existsById(id)) {
             throw new AmenityNotFoundException("amenity not found.");
         }
-        amenityRepository.deleteById(id);
+        amenityJpaRepository.deleteById(id);
     }
 
     private void validateAmenityRequest(AmenityRequestDTO amenity) {

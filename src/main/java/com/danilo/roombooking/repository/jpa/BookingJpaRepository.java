@@ -1,4 +1,4 @@
-package com.danilo.roombooking.repository;
+package com.danilo.roombooking.repository.jpa;
 
 import com.danilo.roombooking.domain.Booking;
 import org.springframework.data.domain.Page;
@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.sql.Timestamp;
 
-public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpecificationExecutor<Booking> {
+public interface BookingJpaRepository extends JpaRepository<Booking, Long>, JpaSpecificationExecutor<Booking> {
     Page<Booking> findByUserId(Long userId, Pageable pageable);
     Page<Booking> findByRoomId(Long roomId, Pageable pageable);
 
