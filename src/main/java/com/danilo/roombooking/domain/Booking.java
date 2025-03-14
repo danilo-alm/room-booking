@@ -12,7 +12,8 @@ import java.sql.Timestamp;
     uniqueConstraints = {@UniqueConstraint(name = "UQ_Booking", columnNames = {"RoomId", "StartTime", "EndTime"})},
     indexes = {
         @Index(name = "IX_Booking", columnList = "RoomId, StartTime, EndTime"),
-        @Index(name = "IX_Booking_UserId", columnList = "UserId")
+        @Index(name = "IX_Booking_UserId", columnList = "UserId"),
+        @Index(name = "IX_Booking_Approved", columnList = "Approved")
     }
 )
 @Data
@@ -25,13 +26,24 @@ import java.sql.Timestamp;
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "amenity_seq")
-    @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
+    @Column(name = "Id", columnDefinition = "BIGINT UNSIGNED")
     @EqualsAndHashCode.Include
     private Long id;
 
-    @JoinColumn(name = "roomId", columnDefinition = "BIGINT UNSIGNED")
+    @JoinColumn(name = "RoomId", columnDefinition = "BIGINT UNSIGNED")
     @ManyToOne(fetch = FetchType.LAZY)
     private Room room;
+
+    @Column(name = "Approved", columnDefinition = "BOOLEAN NOT NULL DEFAULT FALSE")
+    private Boolean approved;
+
+    @JoinColumn(name = "RequestedBy", columnDefinition = "BIGINT UNSIGNED NOT NULL")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User requestedBy;
+
+    @JoinColumn(name = "ApprovedBy", columnDefinition = "BIGINT UNSIGNED")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User approvedBy;
 
     @JoinColumn(name = "UserId", columnDefinition = "BIGINT UNSIGNED")
     @ManyToOne(fetch = FetchType.LAZY)
