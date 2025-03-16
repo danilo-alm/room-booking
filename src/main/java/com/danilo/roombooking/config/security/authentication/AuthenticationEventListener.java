@@ -1,5 +1,6 @@
-package com.danilo.roombooking.config.security;
+package com.danilo.roombooking.config.security.authentication;
 
+import com.danilo.roombooking.config.security.constants.SecurityConstants;
 import com.danilo.roombooking.domain.User;
 import com.danilo.roombooking.service.user.UserService;
 import lombok.RequiredArgsConstructor;

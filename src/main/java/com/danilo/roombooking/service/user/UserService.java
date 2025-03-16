@@ -1,6 +1,6 @@
 package com.danilo.roombooking.service.user;
 
-import com.danilo.roombooking.config.security.SecurityConstants;
+import com.danilo.roombooking.config.security.constants.SecurityConstants;
 import com.danilo.roombooking.domain.User;
 import com.danilo.roombooking.domain.privilege.PrivilegeType;
 import com.danilo.roombooking.domain.role.Role;

@@ -1,4 +1,4 @@
-package com.danilo.roombooking.config.security;
+package com.danilo.roombooking.config.security.constants;
 
 public class SecurityConstants {
     public static final int MIN_PASSWORD_LENGTH = 5;
