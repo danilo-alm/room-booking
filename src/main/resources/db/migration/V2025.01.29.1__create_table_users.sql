@@ -4,6 +4,7 @@ CREATE TABLE Users
     Username            VARCHAR(36)  NOT NULL UNIQUE,
     Password            CHAR(60)     NOT NULL,
     Enabled             BOOLEAN      NOT NULL DEFAULT TRUE,
+    Locked              BOOLEAN      NOT NULL DEFAULT FALSE,
     Email               VARCHAR(254) NOT NULL UNIQUE,
     FullName            VARCHAR(100) NOT NULL,
 

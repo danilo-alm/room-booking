@@ -38,6 +38,9 @@ public class User {
     @Column(name = "Enabled", columnDefinition = "BOOLEAN NOT NULL DEFAULT TRUE")
     private Boolean enabled;
 
+    @Column(name = "Locked", columnDefinition = "BOOLEAN NOT NULL DEFAULT FALSE")
+    private Boolean locked;
+
     @Column(name = "Email", columnDefinition = "VARCHAR(254) NOT NULL UNIQUE")
     private String email;
 
