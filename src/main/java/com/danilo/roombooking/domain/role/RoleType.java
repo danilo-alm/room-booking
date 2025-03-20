@@ -14,7 +14,7 @@ public enum RoleType {
 
     ROLE_MANAGER(Set.of(PrivilegeType.VIEW_AMENITY, PrivilegeType.CREATE_AMENITY, PrivilegeType.EDIT_AMENITY, PrivilegeType.DELETE_AMENITY,
         PrivilegeType.VIEW_ROOMS, PrivilegeType.CREATE_ROOMS, PrivilegeType.EDIT_ROOMS, PrivilegeType.DELETE_ROOMS,
-        PrivilegeType.VIEW_BOOKINGS, PrivilegeType.CREATE_BOOKINGS, PrivilegeType.EDIT_BOOKINGS, PrivilegeType.DELETE_BOOKINGS)),
+        PrivilegeType.VIEW_BOOKINGS, PrivilegeType.REQUEST_BOOKING, PrivilegeType.APPROVE_BOOKING_REQUEST, PrivilegeType.EDIT_BOOKINGS, PrivilegeType.DELETE_BOOKINGS)),
 
     ROLE_USER(Set.of(PrivilegeType.VIEW_AMENITY,
         PrivilegeType.VIEW_ROOMS,
@@ -25,4 +25,5 @@ public enum RoleType {
     RoleType(Set<PrivilegeType> privileges) {
         this.privileges = privileges;
     }
+
 }

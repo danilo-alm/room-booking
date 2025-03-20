@@ -17,6 +17,7 @@ CREATE TABLE Booking
 );
 
 CREATE INDEX IX_Booking ON Booking (RoomId, StartTime, EndTime);
-CREATE INDEX IX_Booking_UserId ON Booking (UserId);
+CREATE INDEX IX_Booking_RequestedBy ON Booking (RequestedBy);
+CREATE INDEX IX_Booking_ApprovedBy ON Booking (ApprovedBy);
 CREATE INDEX IX_Booking_Approved ON Booking (Approved);
 CREATE SEQUENCE booking_sequence AS BIGINT INCREMENT BY 1 START WITH 1;

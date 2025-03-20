@@ -45,10 +45,6 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     private User approvedBy;
 
-    @JoinColumn(name = "UserId", columnDefinition = "BIGINT UNSIGNED")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
-
     @Column(name = "StartTime", columnDefinition = "TIMESTAMP NOT NULL")
     private Timestamp startTime;
 

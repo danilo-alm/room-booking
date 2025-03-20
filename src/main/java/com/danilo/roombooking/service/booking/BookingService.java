@@ -1,7 +1,9 @@
 package com.danilo.roombooking.service.booking;
 
+import com.danilo.roombooking.config.security.CustomUserDetails;
 import com.danilo.roombooking.domain.Booking;
 import com.danilo.roombooking.domain.User;
+import com.danilo.roombooking.domain.privilege.PrivilegeType;
 import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room.RoomStatus;
 import com.danilo.roombooking.dto.BookingFilterDTO;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +31,7 @@ public class BookingService {
     private final BookingRepository bookingRepository;
 
     @Transactional
-    public Booking create(BookingRequestDTO bookingRequestDTO) {
+    public Booking create(BookingRequestDTO bookingRequestDTO, CustomUserDetails userDetails) {
         validateBookingRequest(bookingRequestDTO);
         checkRoomAvailabilityInTimeInterval(bookingRequestDTO);
 
@@ -36,11 +39,16 @@ public class BookingService {
         if (room.getStatus() != RoomStatus.AVAILABLE)
             throw new BookingConflictException();
 
-        User user = userService.getById(bookingRequestDTO.userId());
+        User requestedBy = userService.getById(userDetails.getUserId());
+        User approvedBy = userDetails.getAuthorities()
+            .contains(new SimpleGrantedAuthority(PrivilegeType.APPROVE_BOOKING_REQUEST.name()))
+            ? requestedBy : null;
 
         Booking booking = Booking.builder()
             .room(room)
-            .user(user)
+            .requestedBy(requestedBy)
+            .approvedBy(approvedBy)
+            .approved(approvedBy != null)
             .startTime(bookingRequestDTO.startTime())
             .endTime(bookingRequestDTO.endTime())
             .build();
@@ -57,7 +65,7 @@ public class BookingService {
     }
 
     public Page<Booking> getByUserId(Long userId, Pageable pageable) {
-        return bookingRepository.findByUserId(userId, pageable);
+        return bookingRepository.findByRequestedBy(userId, pageable);
     }
 
     public Page<Booking> getByRoomId(Long roomId, Pageable pageable) {
@@ -66,11 +74,11 @@ public class BookingService {
 
     public Page<Booking> getFilter(BookingFilterDTO bookingFilterDTO, Pageable pageable) {
         Specification<Booking> spec = Specification
-            .where(BookingSpecification.hasRoomId(bookingFilterDTO.roomId())
-            .and(BookingSpecification.hasUserId(bookingFilterDTO.userId())
+            .where(BookingSpecification.hasRoomId(bookingFilterDTO.roomId()))
+            .and(BookingSpecification.hasRequestedByEquals(bookingFilterDTO.requestedBy()))
+            .and(BookingSpecification.hasApprovedByEquals(bookingFilterDTO.approvedBy()))
             .and(BookingSpecification.hasStartTimeGreaterThanOrEqualTo(bookingFilterDTO.minStartTime()))
-            .and(BookingSpecification.hasEndTimeLessThanOrEqualTo(bookingFilterDTO.maxEndTime())))
-        );
+            .and(BookingSpecification.hasEndTimeLessThanOrEqualTo(bookingFilterDTO.maxEndTime()));
 
         return bookingRepository.findAll(spec, pageable);
     }
@@ -84,7 +92,6 @@ public class BookingService {
 
         BookingRequestDTO updateDTO = new BookingRequestDTO(
             booking.getRoom().getId(),
-            booking.getUser().getId(),
             startTime != null ? startTime : booking.getStartTime(),
             endTime != null ? endTime : booking.getEndTime()
         );
@@ -93,6 +100,17 @@ public class BookingService {
 
         booking.setStartTime(updateDTO.startTime());
         booking.setEndTime(updateDTO.endTime());
+
+        return booking;
+    }
+
+    @Transactional
+    public Booking approveBooking(Long bookingId, CustomUserDetails userDetails) {
+        Booking booking = getById(bookingId);
+        User approvedBy = userService.getById(userDetails.getUserId());
+
+        booking.setApproved(true);
+        booking.setApprovedBy(approvedBy);
 
         return booking;
     }
@@ -110,9 +128,6 @@ public class BookingService {
 
         if (bookingRequestDTO.endTime() == null)
             throw new InvalidBookingException("endTime is required.");
-
-        if (bookingRequestDTO.userId() == null)
-            throw new InvalidBookingException("userId is required.");
 
         if (bookingRequestDTO.roomId() == null)
             throw new InvalidBookingException("roomId is required.");

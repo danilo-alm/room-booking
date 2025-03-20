@@ -47,13 +47,10 @@ public class User {
     @Column(name = "FullName", columnDefinition = "VARCHAR(100) NOT NULL")
     private String fullName;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private Set<Booking> bookings;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "RequestedBy")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "requestedBy")
     private Set<Booking> bookingRequests;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "ApprovedBy")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "approvedBy")
     private Set<Booking> ApprovedBookings;
 
     @CreationTimestamp

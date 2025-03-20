@@ -27,7 +27,7 @@ public class CustomProdUsernamePwdAuthenticationProvider implements Authenticati
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         if (passwordEncoder.matches(pwd, userDetails.getPassword()))
-            return new UsernamePasswordAuthenticationToken(username, pwd, userDetails.getAuthorities());
+            return new UsernamePasswordAuthenticationToken(userDetails, pwd, userDetails.getAuthorities());
 
         throw new BadCredentialsException("Invalid password.");
     }

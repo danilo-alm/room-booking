@@ -4,7 +4,8 @@ import java.sql.Timestamp;
 
 public record BookingFilterDTO(
     Long roomId,
-    Long userId,
+    Long requestedBy,
+    Long approvedBy,
     Timestamp minStartTime,
     Timestamp maxEndTime
 ) {

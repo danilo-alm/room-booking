@@ -12,9 +12,14 @@ public class BookingSpecification {
             roomId == null ? null : builder.equal(root.get("roomId"), roomId));
     }
 
-    public static Specification<Booking> hasUserId(Long userId) {
+    public static Specification<Booking> hasRequestedByEquals(Long requestedBy) {
         return ((root, query, builder) ->
-            userId == null ? null : builder.equal(root.get("userId"), userId));
+            requestedBy == null ? null : builder.equal(root.get("requestedBy"), requestedBy));
+    }
+
+    public static Specification<Booking> hasApprovedByEquals(Long approvedBy) {
+        return ((root, query, builder) ->
+            approvedBy == null ? null : builder.equal(root.get("approvedBy"), approvedBy));
     }
 
     public static Specification<Booking> hasStartTimeGreaterThanOrEqualTo(Timestamp minStartTime) {

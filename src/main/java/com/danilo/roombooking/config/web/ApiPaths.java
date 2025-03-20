@@ -42,6 +42,7 @@ public final class ApiPaths {
         public static final String GET_BY_ROOMID = "/room/{roomId}";
         public static final String GET_FILTER = "/filter";
         public static final String UPDATE = "/{id}";
+        public static final String APPROVE = "/approve/{id}";
         public static final String DELETE = "/{id}";
     }
 }

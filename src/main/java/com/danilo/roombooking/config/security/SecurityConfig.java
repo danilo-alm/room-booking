@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
+@EnableWebSecurity
 @Profile("dev")
 public class SecurityConfig {
 
@@ -39,8 +41,8 @@ public class SecurityConfig {
     @Bean
     public RoleHierarchy roleHierarchy() {
         return RoleHierarchyImpl.fromHierarchy(
-            RoleType.ROLE_ADMIN.name() + ">" + RoleType.ROLE_MANAGER.name() + "\n" +
-            RoleType.ROLE_MANAGER.name() + ">" + RoleType.ROLE_USER
+            RoleType.ROLE_ADMIN.name() + " > " + RoleType.ROLE_MANAGER.name() + "\n" +
+            RoleType.ROLE_MANAGER.name() + " > " + RoleType.ROLE_USER.name()
         );
     }
 

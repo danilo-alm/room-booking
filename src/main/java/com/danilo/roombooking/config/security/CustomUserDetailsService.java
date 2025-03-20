@@ -1,6 +1,7 @@
 package com.danilo.roombooking.config.security;
 
 import com.danilo.roombooking.domain.User;
+import com.danilo.roombooking.domain.role.Role;
 import com.danilo.roombooking.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

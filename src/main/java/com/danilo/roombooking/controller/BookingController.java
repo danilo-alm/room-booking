@@ -1,5 +1,6 @@
 package com.danilo.roombooking.controller;
 
+import com.danilo.roombooking.config.security.CustomUserDetails;
 import com.danilo.roombooking.config.web.ApiPaths;
 import com.danilo.roombooking.domain.Booking;
 import com.danilo.roombooking.dto.BookingFilterDTO;
@@ -20,6 +21,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -51,9 +53,10 @@ public class BookingController {
     })
     public ResponseEntity<BookingResponseDTO> create(
         @Parameter(description = "Booking details", required = true)
-        @RequestBody BookingRequestDTO bookingRequestDTO
+        @RequestBody BookingRequestDTO bookingRequestDTO,
+        @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        Booking booking = bookingService.create(bookingRequestDTO);
+        Booking booking = bookingService.create(bookingRequestDTO, customUserDetails);
         URI loc = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path(ApiPaths.Booking.GET_BY_ID)
@@ -159,8 +162,11 @@ public class BookingController {
             example = "?page=0&size=10&sort=startTime,desc")
         @PageableDefault Pageable pageable,
 
-        @Parameter(description = "Filter by user ID", example = "5")
-        @RequestParam(required = false) Long userId,
+        @Parameter(description = "Filter by requestedBy", example = "5")
+        @RequestParam(required = false) Long requestedBy,
+
+        @Parameter(description = "Filter by approvedBy", example = "1")
+        @RequestParam(required = false) Long approvedBy,
 
         @Parameter(description = "Filter by room ID", example = "2")
         @RequestParam(required = false) Long roomId,
@@ -171,10 +177,33 @@ public class BookingController {
         @Parameter(description = "Filter by maximum end time", example = "2025-03-07T18:00:00Z")
         @RequestParam(required = false) Timestamp maxEndTime
     ) {
-        BookingFilterDTO filter = new BookingFilterDTO(roomId, userId, minStartTime, maxEndTime);
+        BookingFilterDTO filter = new BookingFilterDTO(roomId, requestedBy, approvedBy, minStartTime, maxEndTime);
         Page<BookingResponseDTO> bookings = bookingService.getFilter(filter, pageable)
             .map(BookingResponseDTO::new);
         return ResponseEntity.ok(bookings);
+    }
+
+    @PostMapping(ApiPaths.Booking.APPROVE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(
+        summary = "Approve a booking request",
+        description = "Approves an existing booking pending confirmation"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Booking successfully approved",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = BookingResponseDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Booking not found",
+            content = @Content),
+    })
+    public ResponseEntity<BookingResponseDTO> approve(
+        @Parameter(description = "ID of the booking to approve", required = true)
+        @PathVariable Long id,
+
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Booking booking = bookingService.approveBooking(id, userDetails);
+        return ResponseEntity.ok(new BookingResponseDTO(booking));
     }
 
     @PutMapping(ApiPaths.Booking.UPDATE)

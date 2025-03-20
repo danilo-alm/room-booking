@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,14 +20,17 @@ import org.springframework.security.web.SecurityFilterChain;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
+@EnableWebSecurity
 @Profile("prod")
 public class ProdSecurityConfig {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(this::configureRequestMatchers);
+//        http.authorizeHttpRequests(this::configureRequestMatchers);
+        http.authorizeHttpRequests(requests -> requests
+            .requestMatchers("/**").permitAll()
+        );
         http.csrf(AbstractHttpConfigurer::disable);
-        http.formLogin(withDefaults());
         http.httpBasic(withDefaults());
         return http.build();
     }
@@ -39,8 +43,8 @@ public class ProdSecurityConfig {
     @Bean
     public RoleHierarchy roleHierarchy() {
         return RoleHierarchyImpl.fromHierarchy(
-            RoleType.ROLE_ADMIN.name() + ">" + RoleType.ROLE_MANAGER.name() + "\n" +
-            RoleType.ROLE_MANAGER.name() + ">" + RoleType.ROLE_USER
+            RoleType.ROLE_ADMIN.name() + " > " + RoleType.ROLE_MANAGER.name() + "\n" +
+            RoleType.ROLE_MANAGER.name() + " > " + RoleType.ROLE_USER.name()
         );
     }
 
@@ -49,16 +53,16 @@ public class ProdSecurityConfig {
             .AuthorizationManagerRequestMatcherRegistry requests)
     {
         requests
-            .requestMatchers(ApiPaths.User.ROOT + "/**").hasRole(RoleType.ROLE_ADMIN.name())
-
-            .requestMatchers(HttpMethod.GET, ApiPaths.Room.ROOT + "/**").permitAll()
-            .requestMatchers(ApiPaths.Room.ROOT).hasRole(RoleType.ROLE_MANAGER.name())
-
-            .requestMatchers(HttpMethod.GET, ApiPaths.Amenity.ROOT + "/**").permitAll()
-            .requestMatchers(ApiPaths.Amenity.ROOT).hasRole(RoleType.ROLE_MANAGER.name())
+//            .requestMatchers(ApiPaths.User.ROOT + "/**").hasAuthority(RoleType.ROLE_ADMIN.name())
+//
+//            .requestMatchers(ApiPaths.Room.ROOT).hasAuthority(RoleType.ROLE_MANAGER.name())
+//            .requestMatchers(HttpMethod.GET, ApiPaths.Room.ROOT + "/**").permitAll()
+//
+//            .requestMatchers(ApiPaths.Amenity.ROOT).hasAuthority(RoleType.ROLE_MANAGER.name())
+//            .requestMatchers(HttpMethod.GET, ApiPaths.Amenity.ROOT + "/**").permitAll()
 
             .requestMatchers(HttpMethod.GET, ApiPaths.Booking.ROOT).permitAll()
-            .requestMatchers(ApiPaths.Booking.ROOT).hasRole(RoleType.ROLE_MANAGER.name());
+            .requestMatchers(ApiPaths.Booking.ROOT).hasAuthority(RoleType.ROLE_ADMIN.name());
     }
 
 }
