@@ -26,10 +26,7 @@ public class ProdSecurityConfig {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-//        http.authorizeHttpRequests(this::configureRequestMatchers);
-        http.authorizeHttpRequests(requests -> requests
-            .requestMatchers("/**").permitAll()
-        );
+        http.authorizeHttpRequests(this::configureRequestMatchers);
         http.csrf(AbstractHttpConfigurer::disable);
         http.httpBasic(withDefaults());
         return http.build();
@@ -53,13 +50,13 @@ public class ProdSecurityConfig {
             .AuthorizationManagerRequestMatcherRegistry requests)
     {
         requests
-//            .requestMatchers(ApiPaths.User.ROOT + "/**").hasAuthority(RoleType.ROLE_ADMIN.name())
-//
-//            .requestMatchers(ApiPaths.Room.ROOT).hasAuthority(RoleType.ROLE_MANAGER.name())
-//            .requestMatchers(HttpMethod.GET, ApiPaths.Room.ROOT + "/**").permitAll()
-//
-//            .requestMatchers(ApiPaths.Amenity.ROOT).hasAuthority(RoleType.ROLE_MANAGER.name())
-//            .requestMatchers(HttpMethod.GET, ApiPaths.Amenity.ROOT + "/**").permitAll()
+            .requestMatchers(ApiPaths.User.ROOT + "/**").hasAuthority(RoleType.ROLE_ADMIN.name())
+
+            .requestMatchers(ApiPaths.Room.ROOT).hasAuthority(RoleType.ROLE_MANAGER.name())
+            .requestMatchers(HttpMethod.GET, ApiPaths.Room.ROOT + "/**").permitAll()
+
+            .requestMatchers(ApiPaths.Amenity.ROOT).hasAuthority(RoleType.ROLE_MANAGER.name())
+            .requestMatchers(HttpMethod.GET, ApiPaths.Amenity.ROOT + "/**").permitAll()
 
             .requestMatchers(HttpMethod.GET, ApiPaths.Booking.ROOT).permitAll()
             .requestMatchers(ApiPaths.Booking.ROOT).hasAuthority(RoleType.ROLE_ADMIN.name());
