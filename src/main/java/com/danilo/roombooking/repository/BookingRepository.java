@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.sql.Timestamp;
 
 public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpecificationExecutor<Booking> {
-    Page<Booking> findByRequestedBy(Long userId, Pageable pageable);
+    Page<Booking> findByRequestedById(Long userId, Pageable pageable);
     Page<Booking> findByRoomId(Long roomId, Pageable pageable);
 
     @Query("""

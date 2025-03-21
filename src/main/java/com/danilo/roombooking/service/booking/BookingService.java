@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -65,7 +67,7 @@ public class BookingService {
     }
 
     public Page<Booking> getByUserId(Long userId, Pageable pageable) {
-        return bookingRepository.findByRequestedBy(userId, pageable);
+        return bookingRepository.findByRequestedById(userId, pageable);
     }
 
     public Page<Booking> getByRoomId(Long roomId, Pageable pageable) {
