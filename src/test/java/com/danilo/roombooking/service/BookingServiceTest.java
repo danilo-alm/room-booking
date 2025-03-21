@@ -1,7 +1,9 @@
 package com.danilo.roombooking.service;
 
+import com.danilo.roombooking.config.security.CustomUserDetails;
 import com.danilo.roombooking.domain.Booking;
 import com.danilo.roombooking.domain.User;
+import com.danilo.roombooking.domain.privilege.PrivilegeType;
 import com.danilo.roombooking.domain.room.Room;
 import com.danilo.roombooking.domain.room.RoomStatus;
 import com.danilo.roombooking.dto.BookingRequestDTO;
@@ -21,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -53,76 +56,121 @@ public class BookingServiceTest {
 
     private BookingRequestDTO bookingRequestDTO;
     private Booking booking;
+    private CustomUserDetails userDetails;
+    private CustomUserDetails userDetailsNoAuthority;
 
     @BeforeEach
     void setUp() {
         Timestamp now = Timestamp.from(Instant.now());
         Timestamp plusOneHour = Timestamp.from(Instant.now().plus(1, ChronoUnit.HOURS));
 
-        room = new Room();
-        user = new User();
+        room = Room.builder()
+            .id(1L)
+            .status(RoomStatus.AVAILABLE)
+            .build();
+        user = User.builder()
+            .id(1L)
+            .username("user")
+            .password("password")
+            .build();
 
-        bookingRequestDTO = new BookingRequestDTO(1L, 1L, now, plusOneHour);
+        bookingRequestDTO = new BookingRequestDTO(1L, now, plusOneHour);
         booking = new Booking(1L, room, true, user, user, now, plusOneHour, null, null);
+
+        userDetails = new CustomUserDetails(
+            10L, "user", "password", true, false,
+            List.of(new SimpleGrantedAuthority(PrivilegeType.APPROVE_BOOKING_REQUEST.name()))
+        );
+
+        userDetailsNoAuthority = new CustomUserDetails(
+            10L, "user", "password", true, false, List.of()
+        );
     }
 
     @Test
-    public void BookingService_Create_CreatesBooking() {
+    void BookingService_ShouldCreateBooking_WhenUserHasApprovalPrivilege() {
+        when(roomService.getById(any())).thenReturn(room);
+        when(userService.getById(any())).thenReturn(user);
+        when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Booking actualBooking = bookingService.create(bookingRequestDTO, userDetails);
+
+        assertNotNull(actualBooking);
+        assertEquals(actualBooking.getRequestedBy(), user);
+        assertEquals(actualBooking.getApprovedBy(), user);
+        assertTrue(actualBooking.getApproved());
+
+        verify(roomService).getById(any());
+        verify(userService).getById(any());
+        verify(bookingRepository).save(any(Booking.class));
+    }
+
+    @Test
+    void BookingService_ShouldCreateBookingRequest_WhenUserDoesNotHaveApprovalPrivilege() {
         room.setStatus(RoomStatus.AVAILABLE);
 
-        when(roomService.getById(bookingRequestDTO.roomId())).thenReturn(room);
-        when(userService.getById(bookingRequestDTO.requestedBy())).thenReturn(user);
-        when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
+        when(roomService.getById(any())).thenReturn(room);
+        when(userService.getById(any())).thenReturn(user);
+        when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Booking response = bookingService.create(bookingRequestDTO);
+        Booking actualBooking = bookingService.create(bookingRequestDTO, userDetailsNoAuthority);
 
-        assertNotNull(response);
-        assertEquals(response.getId(), booking.getId());
+        assertNotNull(actualBooking);
+        assertEquals(actualBooking.getRequestedBy(), user);
+        assertNull(actualBooking.getApprovedBy());
+        assertFalse(actualBooking.getApproved());
 
-        verify(roomService).getById(bookingRequestDTO.roomId());
-        verify(userService).getById(bookingRequestDTO.requestedBy());
+        verify(roomService).getById(any());
+        verify(userService).getById(any());
         verify(bookingRepository).save(any(Booking.class));
     }
 
     @Test
     public void BookingService_Create_ThrowsException_WhenStartTimeIsNull() {
-        BookingRequestDTO invalidRequest = new BookingRequestDTO(bookingRequestDTO.roomId(), bookingRequestDTO.requestedBy(), null, bookingRequestDTO.endTime());
+        BookingRequestDTO invalidRequest = new BookingRequestDTO(bookingRequestDTO.roomId(), null, bookingRequestDTO.endTime());
 
-        InvalidBookingException exception = assertThrows(InvalidBookingException.class, () -> bookingService.create(invalidRequest));
+        InvalidBookingException exception = assertThrows(InvalidBookingException.class, () ->
+            bookingService.create(invalidRequest, userDetails));
         assertEquals("startTime is required.", exception.getMessage());
     }
 
     @Test
     public void BookingService_Create_ThrowsException_WhenEndTimeIsNull() {
-        BookingRequestDTO invalidRequest = new BookingRequestDTO(bookingRequestDTO.roomId(), bookingRequestDTO.requestedBy(), bookingRequestDTO.startTime(), null);
+        BookingRequestDTO invalidRequest = new BookingRequestDTO(bookingRequestDTO.roomId(), bookingRequestDTO.startTime(), null);
 
-        InvalidBookingException exception = assertThrows(InvalidBookingException.class, () -> bookingService.create(invalidRequest));
+        InvalidBookingException exception = assertThrows(InvalidBookingException.class, () ->
+            bookingService.create(invalidRequest, userDetails));
         assertEquals("endTime is required.", exception.getMessage());
     }
 
     @Test
-    public void BookingService_Create_ThrowsException_WhenUserIdIsNull() {
-        BookingRequestDTO invalidRequest = new BookingRequestDTO(bookingRequestDTO.roomId(), null, bookingRequestDTO.startTime(), bookingRequestDTO.endTime());
-
-        InvalidBookingException exception = assertThrows(InvalidBookingException.class, () -> bookingService.create(invalidRequest));
-        assertEquals("userId is required.", exception.getMessage());
-    }
-
-    @Test
     public void BookingService_Create_ThrowsException_WhenRoomIdIsNull() {
-        BookingRequestDTO invalidRequest = new BookingRequestDTO(null, bookingRequestDTO.requestedBy(), bookingRequestDTO.startTime(), bookingRequestDTO.endTime());
+        BookingRequestDTO invalidRequest = new BookingRequestDTO(null, bookingRequestDTO.startTime(), bookingRequestDTO.endTime());
 
-        InvalidBookingException exception = assertThrows(InvalidBookingException.class, () -> bookingService.create(invalidRequest));
+        InvalidBookingException exception = assertThrows(InvalidBookingException.class, () ->
+            bookingService.create(invalidRequest, userDetails));
         assertEquals("roomId is required.", exception.getMessage());
     }
 
     @Test
     public void BookingService_Create_ThrowsException_WhenStartTimeIsAfterEndTime() {
-        BookingRequestDTO invalidRequest = new BookingRequestDTO(bookingRequestDTO.roomId(), bookingRequestDTO.requestedBy(), bookingRequestDTO.endTime(), bookingRequestDTO.startTime());
+        BookingRequestDTO invalidRequest = new BookingRequestDTO(bookingRequestDTO.roomId(), bookingRequestDTO.endTime(), bookingRequestDTO.startTime());
 
-        InvalidBookingException exception = assertThrows(InvalidBookingException.class, () -> bookingService.create(invalidRequest));
+        InvalidBookingException exception = assertThrows(InvalidBookingException.class, () ->
+            bookingService.create(invalidRequest, userDetails));
 
         assertEquals("startTime cannot be after endTime.", exception.getMessage());
+    }
+
+    @Test
+    public void BookingService_Create_ThrowsException_WhenStartTimeIsInPast() {
+        Timestamp aMinuteAgo = Timestamp.from(Instant.now().minus(1, ChronoUnit.MINUTES));
+        BookingRequestDTO invalidRequest = new BookingRequestDTO(bookingRequestDTO.roomId(), aMinuteAgo, bookingRequestDTO.endTime());
+
+        InvalidBookingException exception = assertThrows(InvalidBookingException.class, () ->
+            bookingService.create(invalidRequest, userDetails));
+
+        assertEquals("startTime cannot be in the past.", exception.getMessage());
     }
 
     @Test
@@ -131,10 +179,11 @@ public class BookingServiceTest {
 
         when(roomService.getById(bookingRequestDTO.roomId())).thenReturn(room);
 
-        BookingConflictException exception = assertThrows(BookingConflictException.class, () -> bookingService.create(bookingRequestDTO));
+        BookingConflictException exception = assertThrows(BookingConflictException.class, () ->
+            bookingService.create(bookingRequestDTO, userDetails));
 
         verify(roomService).getById(bookingRequestDTO.roomId());
-        assertEquals("Room is not available.", exception.getMessage());
+        assertEquals("Room is unavailable or occupied during the requested time slot.", exception.getMessage());
     }
 
     @Test
@@ -168,14 +217,14 @@ public class BookingServiceTest {
     }
 
     @Test
-    public void BookingService_GetByUserId_ReturnsBookings() {
-        when(bookingRepository.findByRequestedBy(user.getId(), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(booking)));
+    public void BookingService_GetByRequestedBy_ReturnsBookings() {
+        when(bookingRepository.findByRequestedById(user.getId(), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(booking)));
 
         Page<Booking> response = bookingService.getByUserId(user.getId(), Pageable.unpaged());
 
         assertNotNull(response);
         assertEquals(List.of(booking), response.getContent());
-        verify(bookingRepository).findByRequestedBy(user.getId(), Pageable.unpaged());
+        verify(bookingRepository).findByRequestedById(user.getId(), Pageable.unpaged());
     }
 
     @Test
@@ -194,7 +243,7 @@ public class BookingServiceTest {
         when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
         when(bookingRepository.isRoomBookedDuringTimeRangeExcludingCurrentBooking(any(), any(), any(), any())).thenReturn(false);
 
-        BookingRequestDTO updateRequest = new BookingRequestDTO(booking.getRoom().getId(), booking.getRequestedBy().getId(), new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis() + 3600000));
+        BookingRequestDTO updateRequest = new BookingRequestDTO(booking.getRoom().getId(), new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis() + 3600000));
 
         Booking response = bookingService.update(booking.getId(), updateRequest);
 
