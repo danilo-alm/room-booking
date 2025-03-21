@@ -136,6 +136,10 @@ public class BookingService {
 
         if (bookingRequestDTO.startTime().after(bookingRequestDTO.endTime()))
             throw new InvalidBookingException("startTime cannot be after endTime.");
+
+        Timestamp secondsAgo = Timestamp.from(Instant.now().minus(10, ChronoUnit.SECONDS));
+        if (bookingRequestDTO.startTime().before(secondsAgo))
+            throw new InvalidBookingException("startTime cannot be in the past.");
     }
 
     private void checkRoomAvailabilityInTimeInterval(BookingRequestDTO bookingRequestDTO) {
